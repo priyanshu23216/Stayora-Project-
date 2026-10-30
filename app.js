@@ -14,9 +14,43 @@ const app = express();
 const connection = mySQL.createConnection({
     host : 'localhost',
     user : 'root',
-    database : 'USER',
+    database : 'AIRBNB',
     password : 'sentinels@@33##**9uh',
     dateStrings : true
+});
+const images = [
+    'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9',
+    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c',
+    'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea',
+    'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0',
+    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c'
+];
+
+let getListings = ( )=>{
+    return [
+        faker.lorem.words(4),
+        faker.lorem.paragraph(),
+        faker.helpers.arrayElement( images ),
+        faker.number.int({ min : 1000 , max : 10000}),
+        faker.location.city(),
+        faker.location.country()
+    ]
+};
+
+let data = [ ];
+
+for ( let i = 0 ; i < 3000 ; i ++){
+    data.push( getListings() );
+};
+
+let query = "INSERT INTO LISTINGS ( TITLE , DESCRIPTION , IMAGE , PRICE , LOCATION , COUNTRY)  VALUE ? ";
+
+connection.query( query , [ data ] , ( err , result)=>{
+    if(err){
+        console.log("some error occured");
+    }else{
+        console.log(result);
+    }
 });
 
 app.set( 'view engine' , 'ejs');
@@ -28,6 +62,17 @@ app.use(methodOverride('_method'));
 
 app.get('/' , ( req , res ) =>{
     res.send("Server started");
+});
+
+app.get('/listings' , ( req , res)=>{
+    let q = "SELECT * FROM LISTINGS";
+    connection.query( q , ( error , result)=>{
+        if(error){
+            res.send("Error 404 Listings Not Found");
+        }else{
+            res.render( 'listings.ejs' , { result } );
+        }
+    });
 });
 
 app.listen(3000 , ()=>{

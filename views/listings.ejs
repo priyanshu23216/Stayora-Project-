@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listings ejs</title>
+</head>
+<body>
+    <h1><b><i>Listings are as following</i></b></h1>
+
+    <% for ( let key of result) { %>
+        <ul>
+            <li><h2><%= key.TITLE %> </h2></li>
+            <li><h2><%= key.DESCRIPTION %></h2></li>
+            <li><img src =  <%= key.IMAGE %> alt = "Listing Image" width = "300" ></li>
+            <li><h2><%= key.PRICE %></h2></li>
+            <li><h2><%= key.LOCATION %></h2></li>
+            <li><h2><%= key.COUNTRY %></h2></li>
+        </ul>
+     <% } %> 
+    
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify User</title>
+    <link rel = 'stylesheet' href = '/css/delete.css'>
+</head>
+<body>
+    <h1>Enter Password To Continue</h1>
+    <form action="/stayora/listing/delete/verify" method="POST">
+
+        <h4 class="mandatory-notice">
+            Field marked with <span>*</span> are mandatory
+        </h4>
+
+        <label for="id">Listing ID</label>
+        <input type="text" id="id" name="ID" value = '<%= id %>' readonly>
+
+        <label for="password" class="required">Password</label>
+        <input type="password" id="password" name="PASSWORD" placeholder="Enter Registered Password" required>
+
+
+        <button type="submit">Submit</button>
+
+    </form>
+
+</body>
+</html>

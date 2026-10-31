@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Document</title>
+    <link rel = 'stylesheet' href = '/css/edit.css'>
+</head>
+<body>
+    <h1>Enter Your Details</h1>
+
+    <form action="/stayora/listing/edit/add" method="POST">
+
+
+        <label for="id">Listing ID</label>
+        <input type="text" id="id" name="ID" value = '<%= result[0].ID %>' readonly>
+
+        <label for="password" class="required">Password</label>
+        <input type="password" id="password" name="PASSWORD">
+
+        <label for="title" class="required">Title</label>
+        <input type="text" id="title" name="TITLE" value = '<%= result[0].TITLE %>'>
+
+        <label for="description" class="required">Description</label>
+        <textarea id="description" name="DESCRIPTION"><%= result[0].DESCRIPTION %></textarea>
+
+        <label for="image">Image URL</label>
+        <input type="url" id="image" name="IMAGE" value = '<%= result[0].IMAGE %>'>
+
+        <label for="price" class="required">Price</label>
+        <input type="number" id="price" name="PRICE" min="1" max="10000" value = '<%= result[0].PRICE %>'>
+
+        <label for="location" class="required">Location</label>
+        <input type="text" id="location" name="LOCATION" value = '<%= result[0].LOCATION %>'>
+
+        <label for="country" class="required">Country</label>
+        <input type="text" id="country" name="COUNTRY" value = '<%= result[0].COUNTRY %>'>
+
+        <button type="submit">Save Changes</button>
+
+    </form>
+    
+</body>
+</html>

@@ -7,7 +7,14 @@
     <link rel = "stylesheet" href ='/css/listings.css'>
 </head>
 <body>
-    <h1><b><i>Listings are as following</i></b></h1>
+    <div class="top-bar">
+        <h1><b><i>Listings are as following</i></b></h1>
+
+    <form method="GET" action="/stayora/listing/create">
+        <button type="submit">+ Become a Host</button>
+    </form>
+
+    </div>
 
     <% for ( let key of result) { %>
         <ul>
@@ -17,16 +24,12 @@
             <li><h2> Price - ₹<%= key.PRICE %>/night</h2></li>
             <li><h2> Location - <%= key.LOCATION %></h2></li>
             <li><h2> Country - <%= key.COUNTRY %></h2></li>
-            <li>
-                <form method = 'GET' action = '/stayora/listing/create'>
-                <button type="submit">Want to register your Place also? Click here to register</button>
-            </form>
+
             </li>
             <li>
                 <form method = 'GET' action = '/stayora/listing/<%= key.ID %>'>
                 <button type="submit">View More</button>
             </form>
-            </li>
         </ul>
      <% } %> 
     

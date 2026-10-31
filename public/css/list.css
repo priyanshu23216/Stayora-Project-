@@ -1,5 +1,6 @@
+
 /* =========================================
-   GLOBAL STYLING
+   GLOBAL RESET
 ========================================= */
 
 * {
@@ -9,51 +10,70 @@
 }
 
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle at top left, #17264a, #0b1224 45%, #080d19);
-    color: #f1f5ff;
     min-height: 100vh;
-    padding: 55px 7%;
+    padding: 65px 25px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+
+    background:
+        radial-gradient(circle at top left, #e0e7ff, transparent 40%),
+        linear-gradient(135deg, #f1f5f9, #e8eaf6);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* =========================================
-   PROPERTY TITLE
+   LISTING TITLE
 ========================================= */
 
 h1 {
-    max-width: 1300px;
-    margin: 0 auto 35px;
-    font-size: 48px;
+    width: 100%;
+    max-width: 1250px;
+
+    color: #171b36;
+    font-size: 40px;
     font-weight: 800;
-    letter-spacing: -1.5px;
-    line-height: 1.2;
-    color: #ffffff;
-    background: linear-gradient(90deg, #ffffff, #a5b4fc, #818cf8);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    letter-spacing: -1.2px;
+
+    margin-bottom: 28px;
+
+    animation: slideUp 0.5s ease;
 }
 
 /* =========================================
-   MAIN PROPERTY CONTAINER
+   MAIN LISTING CARD
 ========================================= */
 
 ol {
-    max-width: 1300px;
-    margin: auto;
-    list-style: none;
-    padding: 24px;
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 22px;
+    width: 100%;
+    max-width: 1250px;
 
-    background: rgba(20, 32, 57, 0.88);
-    border: 1px solid rgba(120, 150, 210, 0.2);
+    list-style: none;
+    padding: 28px;
+
+    background: #ffffff;
     border-radius: 26px;
 
     box-shadow:
-        0 25px 70px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        0 25px 70px rgba(30, 41, 59, 0.10),
+        0 5px 15px rgba(30, 41, 59, 0.04);
+
+    animation: slideUp 0.6s ease;
+}
+
+/* =========================================
+   DESCRIPTION
+========================================= */
+
+ol li:first-child {
+    color: #64748b;
+    font-size: 17px;
+    font-weight: 450;
+    line-height: 1.9;
+
+    margin-bottom: 25px;
+    padding: 5px 3px;
 }
 
 /* =========================================
@@ -61,194 +81,244 @@ ol {
 ========================================= */
 
 ol li:nth-child(2) {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    overflow: hidden;
-    border-radius: 19px;
-    height: 440px;
-}
-
-ol li img {
     width: 100%;
-    height: 100%;
+    margin-bottom: 35px;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+ol li:nth-child(2) img {
     display: block;
+
+    width: 100%;
+    height: 680px;
+
     object-fit: cover;
-    transition: transform 0.6s ease;
-}
+    object-position: center;
 
-ol li:nth-child(2):hover img {
-    transform: scale(1.04);
-}
-
-/* =========================================
-   DESCRIPTION CARD
-========================================= */
-
-ol li:first-child {
-    grid-column: 1;
-    grid-row: 2;
-
-    padding: 27px 30px;
-    background: linear-gradient(145deg, #182943, #111d32);
-    border: 1px solid rgba(110, 145, 205, 0.18);
     border-radius: 20px;
 
-    font-size: 17px;
-    line-height: 1.9;
-    color: #c4cee5;
+    background: #e2e8f0;
+
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.12);
+
+    transition: transform 0.5s ease;
+}
+
+ol li:nth-child(2) img:hover {
+    transform: scale(1.015);
 }
 
 /* =========================================
-   PRICE CARD
+   PRICE
 ========================================= */
 
 ol li:nth-child(3) {
-    grid-column: 2;
-    grid-row: 2;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 25px;
-    border-radius: 20px;
-
-    background: linear-gradient(135deg, #38204f, #172d70);
-    border: 1px solid rgba(139, 92, 246, 0.6);
-
-    color: #ffffff;
-    font-size: 32px;
+    color: #171b36;
+    font-size: 30px;
     font-weight: 800;
+    letter-spacing: -0.5px;
 
-    box-shadow: 0 10px 35px rgba(70, 60, 180, 0.2);
+    margin-bottom: 28px;
 }
 
 /* =========================================
-   LOCATION CARD
+   LOCATION AND COUNTRY
 ========================================= */
 
 ol li:nth-child(4),
 ol li:nth-child(5) {
-    padding: 23px 25px;
-    border-radius: 18px;
+    display: inline-block;
+    width: 48%;
 
-    background: linear-gradient(145deg, #192b47, #142139);
-    border: 1px solid rgba(110, 145, 205, 0.2);
+    padding: 22px 24px;
 
-    color: #d5def5;
-    font-size: 19px;
-    font-weight: 650;
+    background: linear-gradient(135deg, #f5f3ff, #eef2ff);
+
+    border: 1px solid #e0e7ff;
+    border-radius: 15px;
+
+    color: #3730a3;
+    font-size: 16px;
+    font-weight: 700;
+
+    margin-bottom: 20px;
 
     transition: all 0.3s ease;
 }
 
-ol li:nth-child(4) {
-    grid-column: 1;
-    grid-row: 3;
-}
-
 ol li:nth-child(5) {
-    grid-column: 2;
-    grid-row: 3;
+    margin-left: 3%;
 }
 
 ol li:nth-child(4):hover,
 ol li:nth-child(5):hover {
-    border-color: #657ff5;
+    background: #e0e7ff;
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
+ol li:nth-child(6),
+ol li:nth-child(7) {
+    display: inline-block;
+    width: 48%;
+
+    margin-top: 22px;
+}
+
+ol li:nth-child(7) {
+    margin-left: 3%;
+}
+
+ol form {
+    width: 100%;
+}
+
+/* =========================================
+   EDIT BUTTON
+========================================= */
+
+ol li:nth-child(6) button {
+    width: 100%;
+    padding: 19px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: linear-gradient(135deg, #6366f1, #4338ca);
+
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow: 0 8px 22px rgba(79, 70, 229, 0.22);
+
+    transition: all 0.3s ease;
+}
+
+ol li:nth-child(6) button:hover {
+    background: linear-gradient(135deg, #4f46e5, #3730a3);
+
     transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(75, 100, 220, 0.13);
+
+    box-shadow: 0 13px 28px rgba(79, 70, 229, 0.35);
+}
+
+/* =========================================
+   DELETE BUTTON
+========================================= */
+
+ol li:nth-child(7) button {
+    width: 100%;
+    padding: 19px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: linear-gradient(135deg, #f43f5e, #be123c);
+
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow: 0 8px 22px rgba(225, 29, 72, 0.20);
+
+    transition: all 0.3s ease;
+}
+
+ol li:nth-child(7) button:hover {
+    background: linear-gradient(135deg, #e11d48, #9f1239);
+
+    transform: translateY(-4px);
+
+    box-shadow: 0 13px 28px rgba(225, 29, 72, 0.32);
+}
+
+/* =========================================
+   BUTTON ACTIVE
+========================================= */
+
+ol button:active {
+    transform: scale(0.98);
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* =========================================
    RESPONSIVE DESIGN
 ========================================= */
 
-@media (max-width: 850px) {
+@media (max-width: 768px) {
 
     body {
-        padding: 35px 4%;
+        padding: 35px 15px;
     }
 
     h1 {
-        font-size: 36px;
+        font-size: 28px;
+        margin-bottom: 22px;
     }
 
     ol {
-        grid-template-columns: 1fr 1fr;
-        padding: 17px;
-        gap: 15px;
-    }
-
-    ol li:nth-child(2) {
-        height: 350px;
-    }
-
-    ol li:first-child {
-        grid-column: 1 / -1;
-        grid-row: 2;
-    }
-
-    ol li:nth-child(3) {
-        grid-column: 1 / -1;
-        grid-row: 3;
-        justify-content: flex-start;
-    }
-
-    ol li:nth-child(4) {
-        grid-column: 1;
-        grid-row: 4;
-    }
-
-    ol li:nth-child(5) {
-        grid-column: 2;
-        grid-row: 4;
-    }
-}
-
-@media (max-width: 550px) {
-
-    body {
-        padding: 25px 15px;
-    }
-
-    h1 {
-        font-size: 30px;
-        margin-bottom: 23px;
-    }
-
-    ol {
-        grid-template-columns: 1fr;
-        padding: 13px;
+        padding: 18px;
         border-radius: 19px;
     }
 
-    ol li:nth-child(2) {
-        grid-column: 1;
-        grid-row: 1;
-        height: 250px;
-    }
-
-    ol li:first-child {
-        grid-column: 1;
-        grid-row: 2;
-        padding: 20px;
-        font-size: 15px;
+    ol li:nth-child(2) img {
+        height: 380px;
     }
 
     ol li:nth-child(3) {
-        grid-column: 1;
-        grid-row: 3;
-        font-size: 27px;
-        padding: 22px;
+        font-size: 24px;
     }
 
-    ol li:nth-child(4) {
-        grid-column: 1;
-        grid-row: 4;
-    }
-
+    ol li:nth-child(4),
     ol li:nth-child(5) {
-        grid-column: 1;
-        grid-row: 5;
+        width: 100%;
+        margin-left: 0;
+        padding: 17px;
+    }
+
+    ol li:nth-child(6),
+    ol li:nth-child(7) {
+        width: 100%;
+        margin: 10px 0;
     }
 }
+
+@media (max-width: 480px) {
+
+    h1 {
+        font-size: 24px;
+    }
+
+    ol li:nth-child(2) img {
+        height: 280px;
+    }
+
+    ol li:first-child {
+        font-size: 15px;
+    }
+}
+

@@ -135,21 +135,21 @@ let getListings = ( )=>{
     ]
 };
 
-// let data = [ ];
+let data = [ ];
 
-// for ( let i = 0 ; i < 3000 ; i ++){
-//     data.push( getListings() );
-// };
+for ( let i = 0 ; i < 1000 ; i ++){
+    data.push( getListings() );
+};
 
-// let query = "INSERT INTO LISTINGS ( ID , PASSWORD , TITLE , DESCRIPTION , IMAGE , PRICE , LOCATION , COUNTRY)  VALUE ? ";
+let query = "INSERT INTO LISTINGS ( ID , PASSWORD , TITLE , DESCRIPTION , IMAGE , PRICE , LOCATION , COUNTRY)  VALUE ? ";
 
-// connection.query( query , [ data ] , ( err , result)=>{
-//     if(err){
-//         console.log(err);
-//     }else{
-//         console.log(result);
-//     }
-// });
+connection.query( query , [ data ] , ( err , result)=>{
+    if(err){
+        console.log(err);
+    }else{
+        console.log(result);
+    }
+});
 
 app.set( 'view engine' , 'ejs');
 app.set( 'views' , path.join( __dirname , 'views' ) );
@@ -213,6 +213,105 @@ app.get('/stayora/listing/:id' , ( req , res)=>{
             res.render('list.ejs' , { result } );
         }
     });
+});
+app.get('/stayora/listing/edit/:id' , ( req , res)=>{
+    const id = req.params.id;
+    let q = `SELECT * FROM LISTINGS WHERE ID = ?`;
+    connection.query( q , [id] ,( err , result)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.render('verify.ejs' , { result } );
+        }
+    }); 
+});
+
+app.post( '/stayora/listing/edit/verify' ,( req , res)=>{
+    const id = req.body.ID;
+    const enteredPass = req.body.PASSWORD;
+
+    let q = `SELECT * FROM LISTINGS WHERE ID = ?`;
+    connection.query( q , [id] ,( err , result)=>{
+        if(err){
+            console.log(err);
+        }else{
+            if ( enteredPass !== result[0].PASSWORD ){
+                let req = 'edit'
+                res.render('warning.ejs' , { id , req } );
+            }else{
+                res.render('edit.ejs' , { result });
+            }
+        }
+    }); 
+});
+
+app.post( '/stayora/listing/edit/add' , ( req , res)=>{
+    const id = req.body.ID;
+    const passWord = req.body.PASSWORD;
+    const title = req.body.TITLE;
+    const description = req.body.DESCRIPTION;
+    const imageURL = req.body.IMAGE;
+    const price = req.body.PRICE;
+    const location = req.body.LOCATION;
+    const country = req.body.COUNTRY;
+
+    if( passWord.trim() != "" ){
+        let q = 'UPDATE LISTINGS SET PASSWORD = ? , TITLE = ? , DESCRIPTION = ? , IMAGE = ?, PRICE = ?, LOCATION = ?, COUNTRY = ? WHERE ID = ?';
+        connection.query( q , [ passWord , title , description , imageURL , price , location , country , id] , ( err , result)=>{
+            if(err){
+                res.send("Some error occured");
+            }else{
+                res.redirect('/');
+            };
+        });
+    }else{
+        let q = 'UPDATE LISTINGS SET TITLE = ? , DESCRIPTION = ? , IMAGE = ?, PRICE = ?, LOCATION = ?, COUNTRY = ? WHERE ID = ?';
+        connection.query( q , [title , description , imageURL , price , location , country , id] , ( err , result)=>{
+            if(err){
+                res.send("Some error occured");
+            }else{
+                res.redirect('/');
+            };
+        });
+    };
+});
+
+app.get( '/stayora/listing/delete/:id' ,( req , res)=>{
+    const id = req.params.id;
+    res.render('delete.ejs' , { id });
+});
+
+app.post( '/stayora/listing/delete/verify' , ( req , res)=>{
+    const id = req.body.ID;
+    const enteredPass = req.body.PASSWORD;
+
+    let q = `SELECT * FROM LISTINGS WHERE ID = ?`;
+    connection.query( q , [id] ,( err , result)=>{
+        if(err){
+            console.log(err);
+        }else{
+            if ( enteredPass !== result[0].PASSWORD ){
+                let req = 'delete'
+                res.render('warning.ejs' , { id , req } );
+            }else{
+                res.render('destroy.ejs' , { id } );
+            }
+        }
+    }); 
+});
+
+app.delete( '/stayora/list/delete/:id' , ( req , res)=>{
+    const id = req.params.id;
+    let q = 'DELETE FROM LISTINGS WHERE ID = ?'
+    connection.query( q , [ id ] , ( err , result)=>{
+         if(err){
+         console.log(err);
+         res.send('Some error occured Please Try Again');
+         }else{
+        res.redirect('/');
+     };
+     });
+
 });
 
 app.listen(3000 , ()=>{

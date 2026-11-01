@@ -1,0 +1,39 @@
+
+<header class="site-header">
+
+    <nav class="navbar">
+
+        
+        <div class="nav-left">
+            <a href="/" class="nav-logo">Stayora<span>.</span></a>
+        </div>
+
+        
+        <div class="nav-center">
+            <a href="/listings" class="nav-link">Apartments</a>
+            <a href="/faq" class="nav-link">FAQ</a>
+            <a href="/contact" class="nav-link">Contact</a>
+
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="nav-link instagram-link">◎ Instagram </a>
+        </div>
+
+        
+        <div class="nav-right">
+
+             <div class="language-switch">
+                <a href="#" class="language active">EN</a>
+                <a href="#" class="language">ES</a>
+            </div>
+
+            <% if (typeof hideHostButton === 'undefined' || !hideHostButton) { %>
+                <form method="GET" action="/stayora/listing/create">
+                    <button type="submit" class="host-btn"> + Become a Host</button>
+                </form>
+            <% } %>
+
+        
+        </div>
+
+    </nav>
+
+</header>

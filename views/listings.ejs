@@ -1,37 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listings ejs</title>
-    <link rel = "stylesheet" href ='/css/listings.css'>
-</head>
-<body>
-    <div class="top-bar">
-        <h1><b><i>Listings are as following</i></b></h1>
+    
+    <div class="listings-container">
 
-    <form method="GET" action="/stayora/listing/create">
-        <button type="submit">+ Become a Host</button>
-    </form>
+    <% for (let key of result) { %>
 
-    </div>
+        <div class="listing-card">
 
-    <% for ( let key of result) { %>
-        <ul>
-            <li><h2><%= key.TITLE %> </h2></li>
-            <li><h2><%= key.DESCRIPTION %></h2></li>
-            <li><img src =  <%= key.IMAGE %> alt = "Listing Image" width = "300" ></li>
-            <li><h2> Price - ₹<%= key.PRICE %>/night</h2></li>
-            <li><h2> Location - <%= key.LOCATION %></h2></li>
-            <li><h2> Country - <%= key.COUNTRY %></h2></li>
+            <img src="<%= key.IMAGE %>" alt="Listing Image">
 
-            </li>
-            <li>
-                <form method = 'GET' action = '/stayora/listing/<%= key.ID %>'>
+            <h2><%= key.TITLE %></h2>
+
+            <p><%= key.DESCRIPTION %></p>
+
+            <p><%= key.LOCATION %>, <%= key.COUNTRY %></p>
+
+            <h3>₹<%= key.PRICE %> / night</h3>
+
+            <form method="GET" action="/stayora/listing/<%= key.ID %>">
                 <button type="submit">View More</button>
             </form>
-        </ul>
-     <% } %> 
-    
-</body>
-</html>
+
+        </div>
+
+    <% } %>
+
+</div>
+

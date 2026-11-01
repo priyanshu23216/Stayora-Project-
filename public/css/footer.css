@@ -1,0 +1,337 @@
+
+/* ==========================================
+   STAYORA - PREMIUM FOOTER
+========================================== */
+
+.footer {
+    width: 100%;
+    box-sizing: border-box;
+    background:
+        radial-gradient(
+            ellipse at 15% 0%,
+            rgba(79, 99, 190, 0.10),
+            transparent 45%
+        ),
+        #080e1b;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    padding: 65px 6% 25px;
+    margin-top: 80px;
+    color: #cbd5e1;
+}
+
+
+/* ==========================================
+   FOOTER CONTAINER
+========================================== */
+
+.footer-container {
+    max-width: 1500px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: 1.7fr 1fr 1fr 1fr 1.2fr;
+    gap: 45px;
+
+    padding-bottom: 50px;
+}
+
+
+/* ==========================================
+   BRAND SECTION
+========================================== */
+
+.footer-brand {
+    max-width: 310px;
+}
+
+.footer-logo {
+    display: inline-block;
+
+    color: #f8fafc;
+    font-size: 32px;
+    font-weight: 850;
+    letter-spacing: -1.8px;
+
+    text-decoration: none;
+    margin-bottom: 15px;
+
+    transition: 0.3s ease;
+}
+
+.footer-logo span {
+    color: #818cf8;
+}
+
+.footer-logo:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+}
+
+.footer-brand p {
+    color: #94a3b8;
+    font-size: 14px;
+    line-height: 1.8;
+    margin: 0;
+    max-width: 290px;
+}
+
+
+/* ==========================================
+   FOOTER LINK COLUMNS
+========================================== */
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.footer-column h3 {
+    color: #f1f5f9;
+    font-size: 15px;
+    font-weight: 750;
+    margin: 5px 0 7px;
+    letter-spacing: 0.2px;
+}
+
+.footer-column a {
+    position: relative;
+
+    color: #94a3b8;
+    font-size: 13.5px;
+    font-weight: 450;
+
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.footer-column a:hover {
+    color: #a5b4fc;
+    transform: translateX(4px);
+}
+
+
+/* ==========================================
+   FOOTER BOTTOM
+========================================== */
+
+.footer-bottom {
+    max-width: 1500px;
+    margin: 0 auto;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+
+    padding-top: 23px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.footer-bottom p {
+    color: #64748b;
+    font-size: 12.5px;
+    margin: 0;
+}
+
+
+/* ==========================================
+   SOCIAL LINKS
+========================================== */
+
+.footer-socials {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.footer-socials a {
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 550;
+    text-decoration: none;
+
+    transition: color 0.25s ease;
+}
+
+.footer-socials a:hover {
+    color: #818cf8;
+}
+
+
+/* ==========================================
+   TABLET RESPONSIVENESS
+========================================== */
+
+@media (max-width: 1000px) {
+
+    .footer-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px 30px;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+        max-width: 450px;
+    }
+}
+
+
+/* ==========================================
+   MOBILE RESPONSIVENESS
+========================================== */
+
+@media (max-width: 600px) {
+
+    .footer {
+        padding: 45px 6% 22px;
+        margin-top: 55px;
+    }
+
+    .footer-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 35px 20px;
+        padding-bottom: 35px;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+        max-width: 100%;
+    }
+
+    .footer-logo {
+        font-size: 28px;
+    }
+
+    .footer-brand p {
+        font-size: 13px;
+    }
+
+    .footer-column {
+        gap: 13px;
+    }
+
+    .footer-column h3 {
+        font-size: 14px;
+    }
+
+    .footer-column a {
+        font-size: 12.5px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .footer-socials {
+        gap: 20px;
+    }
+}
+
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 350px) {
+
+    .footer-container {
+        gap: 30px 12px;
+    }
+
+    .footer-socials {
+        gap: 14px;
+    }
+
+    .footer-bottom p {
+        font-size: 11px;
+    }
+}
+
+/* FOOTER BOTTOM */
+
+.footer-bottom {
+    max-width: 1500px;
+    margin: 45px auto 0;
+    padding-top: 25px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+}
+
+.footer-bottom p {
+    margin: 0;
+    color: #8490a3;
+    font-size: 13px;
+}
+
+/* SOCIAL MEDIA ICONS */
+
+.footer-socials {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+    flex-shrink: 0;
+    visibility: visible;
+    opacity: 1;
+}
+
+.footer-socials a {
+    width: 38px;
+    height: 38px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    color: #aaa39a;
+    text-decoration: none;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+
+    transition: all 0.3s ease;
+}
+
+.footer-socials svg {
+    display: block;
+    width: 17px;
+    height: 17px;
+}
+
+.footer-socials a:hover {
+    color: #c6a269;
+    border-color: #c6a269;
+    transform: translateY(-3px);
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .footer-socials {
+        justify-content: flex-start;
+    }
+}
+.connect-text {
+    color: #c6a269;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 16px;
+    white-space: nowrap;
+    margin-right: 5px;
+}

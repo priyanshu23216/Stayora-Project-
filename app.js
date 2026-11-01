@@ -5,6 +5,7 @@ import { v4 as uuidv4 }  from 'uuid';
 import methodOverride from 'method-override';
 import { faker } from '@faker-js/faker';
 import mySQL from 'mysql2';
+import expressLayouts from 'express-ejs-layouts';
 
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = path.dirname(__filename);
@@ -135,21 +136,21 @@ let getListings = ( )=>{
     ]
 };
 
-let data = [ ];
+// let data = [ ];
 
-for ( let i = 0 ; i < 1000 ; i ++){
-    data.push( getListings() );
-};
+// for ( let i = 0 ; i < 100 ; i ++){
+//     data.push( getListings() );
+// };
 
-let query = "INSERT INTO LISTINGS ( ID , PASSWORD , TITLE , DESCRIPTION , IMAGE , PRICE , LOCATION , COUNTRY)  VALUE ? ";
+// let query = "INSERT INTO LISTINGS ( ID , PASSWORD , TITLE , DESCRIPTION , IMAGE , PRICE , LOCATION , COUNTRY)  VALUE ? ";
 
-connection.query( query , [ data ] , ( err , result)=>{
-    if(err){
-        console.log(err);
-    }else{
-        console.log(result);
-    }
-});
+// connection.query( query , [ data ] , ( err , result)=>{
+//     if(err){
+//         console.log(err);
+//     }else{
+//         console.log(result);
+//     }
+// });
 
 app.set( 'view engine' , 'ejs');
 app.set( 'views' , path.join( __dirname , 'views' ) );
@@ -157,6 +158,8 @@ app.use( express.static( path.join( __dirname , 'public' )));
 app.use( express.urlencoded({extended : true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
+app.use(expressLayouts);
+app.set('layout', 'layouts/boilerplate.ejs');
 
 
 
@@ -166,12 +169,12 @@ app.get('/' , ( req , res)=>{
         if(error){
             res.send("Error 404 Listings Not Found");
         }else{
-            res.render( 'listings.ejs' , { result } );
+            res.render( 'listings.ejs' , { result , style : 'listings'} );
         }
     });
 });
 app.get('/stayora/listing/create' ,( req , res)=>{
-    res.render('create.ejs');
+    res.render('create.ejs' , { style : 'create' , hideHostButton : true});
 });
 
 app.post('/stayora/listing/add' ,( req , res)=>{
@@ -197,7 +200,7 @@ app.post('/stayora/listing/add' ,( req , res)=>{
         }else{
             const msg1 = 'Registration Successful!✅';
             const msg2 = 'Thank you for registering with us. We are excited to have you onboard!'
-            res.render("message.ejs" , { msg1 , msg2 });
+            res.render("message.ejs" , { msg1 , msg2 , style : 'message' });
         }
     });
 });
@@ -210,7 +213,7 @@ app.get('/stayora/listing/:id' , ( req , res)=>{
         if(err){
             console.log(err);
         }else{
-            res.render('list.ejs' , { result } );
+            res.render('list.ejs' , { result , style : 'list' } );
         }
     });
 });
@@ -221,7 +224,7 @@ app.get('/stayora/listing/edit/:id' , ( req , res)=>{
         if(err){
             console.log(err);
         }else{
-            res.render('verify.ejs' , { result } );
+            res.render('verify.ejs' , { result , style : 'verify' } );
         }
     }); 
 });
@@ -236,10 +239,10 @@ app.post( '/stayora/listing/edit/verify' ,( req , res)=>{
             console.log(err);
         }else{
             if ( enteredPass !== result[0].PASSWORD ){
-                let req = 'edit'
-                res.render('warning.ejs' , { id , req } );
+                let format = 'edit'
+                res.render('warning.ejs' , { id , format , style : 'warning' } );
             }else{
-                res.render('edit.ejs' , { result });
+                res.render('edit.ejs' , { result , style : 'edit' });
             }
         }
     }); 
@@ -278,7 +281,7 @@ app.post( '/stayora/listing/edit/add' , ( req , res)=>{
 
 app.get( '/stayora/listing/delete/:id' ,( req , res)=>{
     const id = req.params.id;
-    res.render('delete.ejs' , { id });
+    res.render('delete.ejs' , { id , style : 'delete'});
 });
 
 app.post( '/stayora/listing/delete/verify' , ( req , res)=>{
@@ -291,10 +294,10 @@ app.post( '/stayora/listing/delete/verify' , ( req , res)=>{
             console.log(err);
         }else{
             if ( enteredPass !== result[0].PASSWORD ){
-                let req = 'delete'
-                res.render('warning.ejs' , { id , req } );
+                let format = 'delete'
+                res.render('warning.ejs' , { id , format , style : 'warning' } );
             }else{
-                res.render('destroy.ejs' , { id } );
+                res.render('destroy.ejs' , { id , style : 'destroy'} );
             }
         }
     }); 

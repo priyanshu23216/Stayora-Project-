@@ -1,35 +1,92 @@
 
-/* =====================================
-   STAYORA - PREMIUM LUXURY NAVBAR
-===================================== */
+/* ============================================
+   STAYORA - NAVBAR
+   Premium Luxury Black & Gold Theme
+============================================ */
+
+/* GLOBAL RESET */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    min-height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    scroll-behavior: smooth;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex;
+    flex-direction: column;
+
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* PAGE CONTENT */
+
+.page-content {
+    width: 100%;
+    flex: 1 0 auto;
+}
+
+/* ============================================
+   NAVBAR HEADER
+============================================ */
 
 .site-header {
     width: 100%;
+    min-height: 82px;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
     background: #080808;
     border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-    position: relative;
-    z-index: 1000;
+
+    position: sticky;
+    top: 0;
+    left: 0;
+
+    z-index: 99999;
+    flex-shrink: 0;
 }
+
+/* NAVBAR CONTAINER */
 
 .navbar {
     width: 100%;
     max-width: 1450px;
     min-height: 82px;
+
     margin: 0 auto;
-    padding: 0 5%;
+    padding: 0 35px;
 
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
 }
 
-/* LOGO */
+/* ============================================
+   LOGO
+============================================ */
 
 .nav-left {
     justify-self: start;
 }
 
 .nav-logo {
+    display: inline-block;
+
     text-decoration: none;
     color: #f5f1e9;
 
@@ -37,13 +94,21 @@
     font-size: 29px;
     font-weight: 400;
     letter-spacing: -1px;
+
+    transition: opacity 0.3s ease;
 }
 
 .nav-logo span {
     color: #c6a269;
 }
 
-/* CENTER LINKS */
+.nav-logo:hover {
+    opacity: 0.8;
+}
+
+/* ============================================
+   CENTER NAVIGATION
+============================================ */
 
 .nav-center {
     display: flex;
@@ -61,6 +126,7 @@
     letter-spacing: 0.3px;
 
     white-space: nowrap;
+
     transition: color 0.3s ease;
 }
 
@@ -72,35 +138,38 @@
     font-size: 11px;
 }
 
-/* RIGHT SECTION */
+/* ============================================
+   RIGHT SECTION
+============================================ */
 
 .nav-right {
     justify-self: end;
 
     display: flex;
-    justify-content: flex-end;
     align-items: center;
+    justify-content: flex-end;
     gap: 18px;
 }
 
-/* HOST FORM */
-
 .nav-right form {
-    display: block;
+    display: flex;
     margin: 0;
     padding: 0;
 }
 
-/* BECOME A HOST BUTTON */
+/* ============================================
+   BECOME A HOST BUTTON
+============================================ */
 
 .nav-right .host-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    min-width: 145px;
-    min-height: 42px;
-    padding: 0 20px;
+    min-width: 175px;
+    height: 50px;
+
+    padding: 0 22px;
 
     background: #c6a269;
     color: #080808;
@@ -115,7 +184,6 @@
 
     white-space: nowrap;
     cursor: pointer;
-    flex-shrink: 0;
 
     transition: all 0.3s ease;
 }
@@ -123,10 +191,12 @@
 .nav-right .host-btn:hover {
     background: #dfbd87;
     border-color: #dfbd87;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
 }
 
-/* LANGUAGE SELECTOR */
+/* ============================================
+   LANGUAGE SELECTOR
+============================================ */
 
 .language-switch {
     display: flex;
@@ -156,18 +226,18 @@
     color: #ffffff;
 }
 
-/* =====================================
-   RESPONSIVE
-===================================== */
+/* ============================================
+   RESPONSIVE DESIGN
+============================================ */
 
 @media (max-width: 1050px) {
 
     .navbar {
-        padding: 0 25px;
+        padding: 0 22px;
     }
 
     .nav-center {
-        gap: 22px;
+        gap: 20px;
     }
 
     .nav-right {
@@ -175,7 +245,7 @@
     }
 
     .nav-right .host-btn {
-        min-width: 125px;
+        min-width: 135px;
         padding: 0 12px;
     }
 }
@@ -185,7 +255,7 @@
     .navbar {
         grid-template-columns: 1fr auto;
         row-gap: 20px;
-        padding: 18px 25px;
+        padding: 18px 22px;
     }
 
     .nav-left {
@@ -201,6 +271,7 @@
     .nav-center {
         grid-column: 1 / -1;
         grid-row: 2;
+
         flex-wrap: wrap;
         gap: 22px;
     }
@@ -209,7 +280,7 @@
 @media (max-width: 480px) {
 
     .navbar {
-        padding: 16px 15px;
+        padding: 16px 12px;
     }
 
     .nav-logo {
@@ -222,13 +293,13 @@
 
     .nav-right .host-btn {
         min-width: auto;
-        min-height: 36px;
+        height: 38px;
         padding: 0 10px;
         font-size: 10px;
     }
 
     .nav-center {
-        gap: 15px;
+        gap: 14px;
     }
 
     .nav-link {
@@ -240,12 +311,23 @@
         font-size: 9px;
     }
 }
-.site-header {
-    width: 100%;
-    background: #080808;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 
+html,
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.site-header {
     position: sticky;
     top: 0;
-    z-index: 9999;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    transform: none !important;
 }

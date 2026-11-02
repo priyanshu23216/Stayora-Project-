@@ -1,27 +1,36 @@
-    
-    <div class="listings-container">
 
+<div class="listings-container">
     <% for (let key of result) { %>
-
         <div class="listing-card">
+            <div class="listing-image">
+                <img src="<%= key.IMAGE || '/images/default-property.jpg' %>" alt="<%= key.TITLE %>">
 
-            <img src="<%= key.IMAGE %>" alt="Listing Image">
+                <% if (key.VERIFICATION_STATUS === 'approved') { %>
+                    <span class="verified-badge">✓ Verified Property</span>
+                <% } %>
 
-            <h2><%= key.TITLE %></h2>
+                <% if (key.AVAILABILITY_STATUS === 'available') { %>
+                    <span class="availability-badge">Available</span>
+                <% } %>
+            </div>
 
-            <p><%= key.DESCRIPTION %></p>
-
-            <p><%= key.LOCATION %>, <%= key.COUNTRY %></p>
-
-            <h3>₹<%= key.PRICE %> / night</h3>
-
-            <form method="GET" action="/stayora/listing/<%= key.ID %>">
-                <button type="submit">View More</button>
-            </form>
-
+            <div class="listing-content">
+                <p class="listing-location"><%= key.LOCATION %>, <%= key.CITY %></p>
+                <h2><%= key.TITLE %></h2>
+                <div class="property-details">
+                    <% if (key.BHK) { %><span><%= key.BHK %> BHK</span><% } %>
+                    <% if (key.BATHROOMS) { %><span><%= key.BATHROOMS %> Bathrooms</span><% } %>
+                    <% if (key.FURNISHING) { %><span><%= key.FURNISHING %></span><% } %>
+                </div>
+                <p class="listing-description"><%= key.DESCRIPTION %></p>
+                <div class="listing-price">
+                    <h3>₹<%= Number(key.PRICE).toLocaleString('en-IN') %> / month</h3>
+                    <% if (key.SECURITY_DEPOSIT != null) { %>
+                        <p>Security Deposit: ₹<%= Number(key.SECURITY_DEPOSIT).toLocaleString('en-IN') %></p>
+                    <% } %>
+                </div>
+                <a href="/stayora/listing/<%= key.ID %>" class="view-more-btn">View Property</a>
+            </div>
         </div>
-
     <% } %>
-
 </div>
-

@@ -15,7 +15,7 @@ const app = express();
 const connection = mySQL.createConnection({
     host : 'localhost',
     user : 'root',
-    database : 'AIRBNB',
+    database : 'STAYORA',
     password : 'sentinels@@33##**9uh',
     dateStrings : true
 });
@@ -121,36 +121,63 @@ const images = [
     "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87",
     "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9"
 ];
+let locations = [
+    { location: 'Laxmi Nagar', pincode: '110092' },
+    { location: 'Preet Vihar', pincode: '110092' },
+    { location: 'Dwarka', pincode: '110075' },
+    { location: 'Rohini', pincode: '110085' },
+    { location: 'Saket', pincode: '110017' },
+    { location: 'Malviya Nagar', pincode: '110017' },
+    { location: 'Janakpuri', pincode: '110058' },
+    { location: 'Vasant Kunj', pincode: '110070' },
+    { location: 'Uttam Nagar', pincode: '110059' },
+    { location: 'Rajouri Garden', pincode: '110027' },
+    { location: 'Pitampura', pincode: '110034' },
+    { location: 'Mayur Vihar', pincode: '110091' },
+    { location: 'Kalkaji', pincode: '110019' },
+    { location: 'Karol Bagh', pincode: '110005' },
+    { location: 'Model Town', pincode: '110009' }
+];
+
+let price = faker.number.int({ min: 1000, max: 10000 });
 
 
-let getListings = ( )=>{
+let getListings = () => {
+    let selectedLocation = faker.helpers.arrayElement(locations);
+    let price = faker.number.int({ min: 8000, max: 50000 });
+
     return [
-        uuidv4(),
-        faker.internet.password(),
-        faker.lorem.words(4),
-        faker.lorem.paragraph(),
-        faker.helpers.arrayElement( images ),
-        faker.number.int({ min : 1000 , max : 10000}),
-        faker.location.city(),
-        faker.location.country()
-    ]
+    uuidv4(),
+    faker.company.name(),
+    faker.lorem.paragraph(),
+    faker.helpers.arrayElement(images),
+    faker.helpers.arrayElement(['hotel', 'resort', 'hostel', 'guesthouse']),
+    faker.number.int({ min: 1, max: 5 }),
+    price,
+    selectedLocation.location,
+    'Delhi',
+    selectedLocation.pincode,
+    null,
+    null
+];
+
 };
 
-// let data = [ ];
+let data = [];
 
-// for ( let i = 0 ; i < 100 ; i ++){
-//     data.push( getListings() );
-// };
+for (let i = 0; i < 100; i++) {
+    data.push(getListings());
+}
 
-// let query = "INSERT INTO LISTINGS ( ID , PASSWORD , TITLE , DESCRIPTION , IMAGE , PRICE , LOCATION , COUNTRY)  VALUE ? ";
+let query = `INSERT INTO PROPERTIES (ID, TITLE, DESCRIPTION, IMAGE, PROPERTY_TYPE, BHK, BATHROOMS, FURNISHING, PRICE, SECURITY_DEPOSIT, LOCATION, CITY, STATE, PINCODE, LATITUDE, LONGITUDE) VALUES ?`;
 
-// connection.query( query , [ data ] , ( err , result)=>{
-//     if(err){
-//         console.log(err);
-//     }else{
-//         console.log(result);
-//     }
-// });
+connection.query(query, [data], (err, result) => {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log(`LISTINGS INSERTED SUCCESSFULLY`);
+    }
+});
 
 app.set( 'view engine' , 'ejs');
 app.set( 'views' , path.join( __dirname , 'views' ) );
@@ -164,7 +191,7 @@ app.set('layout', 'layouts/boilerplate.ejs');
 
 
 app.get('/' , ( req , res)=>{
-    let q = "SELECT * FROM LISTINGS";
+    let q = "SELECT * FROM PROPERTIES";
     connection.query( q , ( error , result)=>{
         if(error){
             res.send("Error 404 Listings Not Found");
@@ -192,7 +219,7 @@ app.post('/stayora/listing/add' ,( req , res)=>{
     const location = req.body.LOCATION;
     const country = req.body.COUNTRY;
 
-    let query = 'INSERT INTO LISTINGS ( ID , PASSWORD , TITLE , DESCRIPTION , IMAGE , PRICE , LOCATION , COUNTRY) VALUE ( ? , ? , ? , ? , ? , ? , ? , ?)';
+    let query = 'INSERT INTO PROPERTIES ( ID , PASSWORD , TITLE , DESCRIPTION , IMAGE , PRICE , LOCATION , COUNTRY) VALUE ( ? , ? , ? , ? , ? , ? , ? , ?)';
     
     connection.query( query ,[ newID , password , title , description , image , price , location , country] , ( err , result)=>{
         if(err){

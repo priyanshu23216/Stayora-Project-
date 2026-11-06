@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import methodOverride from "method-override";
 import expressLayouts from "express-ejs-layouts";
-import session from "express-session";
+import sessionMiddleware from "./config/session.js";
 import flash from "connect-flash";
 
 import db from "./config/db.js";
@@ -40,5 +40,5 @@ app.use(passport.session());
 
 
 app.listen(process.env.PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
+    console.log(`Server is listening on port ${process.env.PORT}`);
 });

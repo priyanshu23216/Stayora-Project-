@@ -1,4 +1,7 @@
-    <h1>Welcome to <%= title %></h1>
 
+<% if (currentUser) { %>
+    <a href="/authenticate/logout">Logout</a>
+<% } else { %>
     <a href="/authenticate/login">Login</a>
-    <a href="/authenticate/signup"> New? Register here</a>
+    <a href="/authenticate/signup">New? Register here</a>
+<% } %>

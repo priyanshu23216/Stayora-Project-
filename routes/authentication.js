@@ -22,38 +22,69 @@ const loginLimiter = rateLimit({
   message: "Too many login attempts. Please try again in 15 minutes.",
 });
 
-router.get('/login' ,( req , res)=>{
-    res.render('login' , { type : login});
+router.get('/login', (req, res) => {
+    res.render('login', { title: 'login' });
 });
 
 router.post('/login/verify', loginLimiter, passport.authenticate("local", {
-    successRedirect: "/",
     failureRedirect: "/authenticate/login",
     failureFlash: true,
-  }));
-
-
-router.get('/signup' , ( req , res)=>{
-    res.render('signup' , { type : 'Sign Up' });
+}), (req, res) => {
+    req.flash("success", `Welcome back, ${req.user.NAME}!`);
+    res.redirect("/");
 });
-router.post('/signup/add' , signupLimiter, async( req , res , next)=>{
-    const { name, email, password, role } = req.body;
 
-    const id = uuidv4();
+router.get('/signup', (req, res) => {
+    res.render('signup', { title: 'Sign Up' });
+});
 
-    const passwordHash = await bcrypt.hash(password, 12);
+router.post('/signup/add', signupLimiter, async (req, res, next) => {
+    try {
+        const { name, email, password, role } = req.body;
+        const id = uuidv4();
+        const passwordHash = await bcrypt.hash(password, 12);
 
-    await db.execute("INSERT INTO users (ID, NAME, EMAIL, PASSWORD, ROLE) VALUES (?, ?, ?, ?, ?)", [id, name, email, passwordHash, role]);
+        await db.execute(
+            "INSERT INTO users (ID, NAME, EMAIL, PASSWORD, ROLE) VALUES (?, ?, ?, ?, ?)",
+            [id, name, email, passwordHash, role]
+        );
 
-   const user = { ID: id, NAME: name, EMAIL: email, ROLE: role };
+        const user = { ID: id, NAME: name, EMAIL: email, ROLE: role };
 
-   req.login( user , ( err)=>{
-    if(err){
-        return next( err );
+        req.login(user, (err) => {
+            if (err) return next(err);
+            req.flash("success", `Welcome to Stayora, ${name}!`);
+            res.redirect('/');
+        });
+    } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            req.flash("error", "This email is already registered. Please login!");
+            return res.redirect('/authenticate/signup');
+        }
+        next(err);
     }
-    res.redirect('/');
-   });
 });
 
+router.get('/google', passport.authenticate('google', {
+    scope: ['profile', 'email']
+}));
+
+router.get('/google/callback', passport.authenticate('google', {
+    failureRedirect: '/authenticate/login',
+    failureFlash: true,
+}), (req, res) => {
+    req.flash('success', `Welcome to Stayora, ${req.user.NAME}!`);
+    res.redirect('/');
+});
+
+router.get('/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        req.flash("success", "You have been logged out successfully!");
+        res.redirect('/');
+    });
+});
 
 export default router;

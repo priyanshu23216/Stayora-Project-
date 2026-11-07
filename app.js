@@ -16,12 +16,10 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(expressLayouts);
 app.set("layout", "layouts/boilerplate.ejs");
-
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
@@ -32,14 +30,18 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-app.use('/authenticate' , users);
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
 
-
+app.use('/authenticate', users);
 
 app.get("/", (req, res) => {
     res.render("index", { title: "Home" });
 });
-
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is listening on port ${process.env.PORT}`);

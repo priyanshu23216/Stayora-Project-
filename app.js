@@ -9,6 +9,7 @@ import flash from "connect-flash";
 
 import db from "./config/db.js";
 import passport from "./config/passport.js";
+import users from "./routes/authentication.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +31,15 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+
+app.use('/authenticate' , users);
+
+
+
+app.get("/", (req, res) => {
+    res.render("index", { title: "Home" });
+});
+
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is listening on port ${process.env.PORT}`);

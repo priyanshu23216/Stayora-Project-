@@ -70,7 +70,7 @@ passport.use(
                     return done(null, usersByGoogleId[0]);
                 }
 
-                const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+                const email = profile.emails?.[0]?.value || null;
                 if (email) {
                     const [usersByEmail] = await db.query(
                         "SELECT ID, NAME, EMAIL, ROLE FROM USERS WHERE EMAIL = ?",

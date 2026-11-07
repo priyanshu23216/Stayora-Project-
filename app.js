@@ -26,18 +26,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
-
-
-app.use(flash());
-
-
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
-
-
-
-
-
+app.use(flash());
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is listening on port ${process.env.PORT}`);

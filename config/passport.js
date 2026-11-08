@@ -26,19 +26,24 @@ passport.use(
         { usernameField: "email", passwordField: "password" },
         async (email, password, done) => {
             try {
-                const [rows] = await db.query(
+                // check if the user exists in the database by email
+                const [result] = await db.query(
                     "SELECT * FROM USERS WHERE EMAIL = ?",
                     [email]
                 );
-                const user = rows[0];
+                const user = result[0];
+
+                // If the user is not found, return an error message
 
                 if (!user) {
                     return done(null, false, { message: "Invalid email or password" });
                 }
+                // If the user is found but does not have a password (e.g., registered via Google/GitHub), return an error message
 
                 if (!user.PASSWORD) {
                     return done(null, false, { message: "Please login using Google/GitHub" });
                 }
+                // Compare the provided password with the hashed password in the database
 
                 const isMatch = await bcrypt.compare(password, user.PASSWORD);
                 if (!isMatch) {
@@ -62,15 +67,21 @@ passport.use(
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                const [usersByGoogleId] = await db.query(
+                // Check if the user already exists in the database by Google ID
+                const [user] = await db.query(
                     "SELECT ID, NAME, EMAIL, ROLE FROM USERS WHERE GOOGLE_ID = ?",
                     [profile.id]
                 );
-                if (usersByGoogleId.length > 0) {
-                    return done(null, usersByGoogleId[0]);
+                if (user.length > 0) {
+                    return done(null, user[0]);
                 }
+                // If the user is not found by Google ID, check if the email exists in the database
 
-                const email = profile.emails?.[0]?.value || null;
+                let email = null;
+
+                if ( profile.emails && profile.emails.length>0){
+                    email = profile.emails[0].value;
+                };
                 if (email) {
                     const [usersByEmail] = await db.query(
                         "SELECT ID, NAME, EMAIL, ROLE FROM USERS WHERE EMAIL = ?",
@@ -84,7 +95,7 @@ passport.use(
                         return done(null, usersByEmail[0]);
                     }
                 }
-
+// If the user is not found by Google ID or email, create a new user
                 const id = uuidv4();
                 const name = profile.displayName || "Google User";
                 const role = "guest";

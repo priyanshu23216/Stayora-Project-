@@ -5,22 +5,30 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import db from "./db.js";
 
+// Serialize user by ID
 passport.serializeUser((user, done) => {
     done(null, user.ID);
 });
-
+// Deserialize user by ID
 passport.deserializeUser(async (id, done) => {
     try {
         const [rows] = await db.query(
             "SELECT ID, NAME, EMAIL, ROLE FROM USERS WHERE ID = ?",
             [id]
         );
-        done(null, rows[0] || false);
+
+        const user = rows[0];
+
+        if (!user) {
+            return done(null, false);
+        }
+
+        return done(null, user);
     } catch (err) {
-        done(err);
+        return done(err);
     }
 });
-
+// Local Strategy
 passport.use(
     new LocalStrategy(
         { usernameField: "email", passwordField: "password" },
@@ -58,6 +66,7 @@ passport.use(
     )
 );
 
+// Google OAuth Strategy
 passport.use(
     new GoogleStrategy(
         {
@@ -82,29 +91,34 @@ passport.use(
                 if ( profile.emails && profile.emails.length>0){
                     email = profile.emails[0].value;
                 };
-                if (email) {
-                    const [usersByEmail] = await db.query(
-                        "SELECT ID, NAME, EMAIL, ROLE FROM USERS WHERE EMAIL = ?",
-                        [email]
-                    );
-                    if (usersByEmail.length > 0) {
-                        await db.execute(
-                            "UPDATE USERS SET GOOGLE_ID = ? WHERE EMAIL = ?",
-                            [profile.id, email]
-                        );
+                if (email) { // If email is found, check if it exists in the database
+            const [usersByEmail] = await db.query("SELECT ID, NAME, EMAIL, ROLE FROM USERS WHERE EMAIL = ?", [email] );     
+                if (usersByEmail.length > 0) {
+                        await db.execute( "UPDATE USERS SET GOOGLE_ID = ? WHERE EMAIL = ?", [profile.id, email] );
                         return done(null, usersByEmail[0]);
                     }
-                }
-// If the user is not found by Google ID or email, create a new user
+                } else if (!email) { // If no email is found in the Google profile, return an error message
+                    return done(null, false, { message: "No email found in Google profile" });
+                };
+
+           // If the user is not found by Google ID or email, create a new user
                 const id = uuidv4();
-                const name = profile.displayName || "Google User";
-                const role = "guest";
+                let name = null;
+                if (profile.displayName) {
+                    name = profile.displayName;
+                }else {// If displayName is not available, construct the name from givenName and familyName
+                    if( profile.name && profile.name.givenName && profile.name.familyName){
+                        name = `${profile.name.givenName} ${profile.name.familyName}`;
+                    }else if (profile.name && profile.name.givenName) {
+                        name = profile.name.givenName;
+                    }else{
+                        name = "Guest User";
+                    }                
+                }; 
+                
+                const role = "guest"; // Default role for new users
 
-                await db.execute(
-                    "INSERT INTO USERS (ID, NAME, EMAIL, GOOGLE_ID, ROLE) VALUES (?, ?, ?, ?, ?)",
-                    [id, name, email, profile.id, role]
-                );
-
+    await db.execute( "INSERT INTO USERS (ID, NAME, EMAIL, GOOGLE_ID, ROLE) VALUES (?, ?, ?, ?, ?)",[id, name, email, profile.id, role] );
                 const newUser = { ID: id, NAME: name, EMAIL: email, ROLE: role };
                 return done(null, newUser);
             } catch (err) {

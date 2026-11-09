@@ -31,6 +31,13 @@
                 </form>
             <% } %>
 
+            <% if (currentUser) { %>
+                <a href="/authenticate/logout" class="nav-link">Logout</a>
+            <% } else { %>
+                <a href="/authenticate/login" class="nav-link">Login</a>
+                <a href="/authenticate/signup" class="nav-link">Register</a>
+            <% } %>
+
         
         </div>
 

@@ -40,12 +40,13 @@ router.get('/signup', (req, res) => {
 
 router.post('/signup/add', signupLimiter, async (req, res, next) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password } = req.body;
         const id = uuidv4();
+        const role = 'guest';
         const passwordHash = await bcrypt.hash(password, 12);
 
         await db.execute(
-            "INSERT INTO users (ID, NAME, EMAIL, PASSWORD, ROLE) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO USERS (ID, NAME, EMAIL, PASSWORD, ROLE) VALUES (?, ?, ?, ?, ?)",
             [id, name, email, passwordHash, role]
         );
 

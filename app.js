@@ -8,6 +8,7 @@ import sessionMiddleware from "./config/session.js";
 import flash from "connect-flash";
 
 import db from "./config/db.js";
+import redis from "./config/redis.js";
 import passport from "./config/passport.js";
 import users from "./routes/authentication.js";
 

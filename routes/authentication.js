@@ -34,12 +34,6 @@ const otpVerifyLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-const otpResendLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 5,
-    standardHeaders: true,
-    legacyHeaders: false,
-});
 
 router.get('/login', (req, res) => {
     res.render('login', { title: 'login' });
@@ -82,8 +76,8 @@ router.post('/signup/add', signupLimiter, async (req, res, next) => {
         const pendingKey = `signup:pending:${email}`;
         const pendingSignup = JSON.stringify({ id, name, email, passwordHash, role });// redis stores in string/text format
 
-        await redis.set(redisKey, hashedOTP, "EX", 300);
-        await redis.set(pendingKey, pendingSignup, "EX", 300);
+        await redis.set(redisKey, hashedOTP, "EX", 400);
+        await redis.set(pendingKey, pendingSignup, "EX", 600);
 
         try {
             await sendOtpEmail(email, otp);
@@ -133,18 +127,32 @@ router.post('/signup/verify-otp', async (req, res, next) => {
     }
 });
 
-router.post('/authenticate/signup/resend-otp' , otpResendLimiter , async (req, res, next) => {
+router.post('/authenticate/signup/resend-otp' , async (req, res, next) => {
     try {
         const email = req.body.email.toLowerCase().trim();
         const pendingSignup = await redis.get(`signup:pending:${email}`);
+
+        const limit = `otpResend:${email}`;
+
+// Check the number of OTP resend attempts for this email in Redis
+        const track = await redis.incr(limit);
+        if (track === 1) {
+            await redis.expire(limit, 900);
+        } else if (track > 3) { // If the user has exceeded the limit of 3 attempts within 15 minutes then block further attempts and return an error message
+            req.flash("error", "You have exceeded the maximum number of OTP resend attempts. Please try again after 15 minutes.");
+            return res.redirect('/authenticate/signup');
+        };
+
+// if user signup time has expired then redirect to signup page with error message
         if (!pendingSignup) { // key expired
             req.flash("error", "Your session has expired. Please sign up again.");
             return res.redirect('/authenticate/signup');
         };
 
+        // Generate a new OTP, hash it, and store it in Redis with a 5-minute expiration time
         const otp = crypto.randomInt(100000, 1000000).toString();
         const hashedOTP = crypto.createHash("sha256").update(otp).digest("hex");
-        await redis.set(`otp:${email}`, hashedOTP, "EX", 300);
+        await redis.set(`otp:${email}`, hashedOTP, "EX", 400);
 
         try {
             await sendOtpEmail(email, otp);

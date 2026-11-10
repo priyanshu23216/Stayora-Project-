@@ -1,0 +1,50 @@
+<h1>Verify your email</h1>
+
+<p>Enter the six-digit code sent to <strong><%= email %></strong>.</p>
+
+<form action="/authenticate/signup/verify-otp" method="POST">
+	<input type="hidden" name="email" value="<%= email %>">
+
+	<div>
+		<label for="otp">Verification code</label>
+		<input
+			id="otp"
+			name="otp"
+			type="text"
+			inputmode="numeric"
+			autocomplete="one-time-code"
+			pattern="[0-9]{6}"
+			minlength="6"
+			maxlength="6"
+			required
+		>
+	</div>
+
+	<button type="submit">Verify email</button>
+</form>
+
+<form action="/authenticate/signup/resend-otp" method="POST">
+	<input type="hidden" name="email" value="<%= email %>">
+	<p id="resend-countdown-message">
+		You can request another code in <span id="resend-countdown">60</span> seconds.
+	</p>
+	<button id="resend-otp-button" type="submit" hidden>Resend code</button>
+</form>
+
+<script>
+	const resendButton = document.getElementById("resend-otp-button");
+	const countdownMessage = document.getElementById("resend-countdown-message");
+	const countdownText = document.getElementById("resend-countdown");
+	let secondsLeft = 60;
+
+	const countdownTimer = setInterval(() => {
+		secondsLeft--;
+		countdownText.textContent = secondsLeft;
+
+		if (secondsLeft === 0) {
+			clearInterval(countdownTimer);
+			countdownMessage.hidden = true;
+			resendButton.hidden = false;
+		}
+	}, 1000);
+</script>

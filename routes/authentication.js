@@ -4,6 +4,11 @@ import bcrypt from "bcrypt";
 import db from "../config/db.js";
 import rateLimit from "express-rate-limit";
 import passport from "../config/passport.js";
+import {sendOtpEmail} from "../utils/mailer.js";
+import crypto from "crypto";
+import redis from "../config/redis.js";
+import { json } from 'stream/consumers';
+import { truncateSync } from 'fs';
 
 const router = express.Router();
 
@@ -20,6 +25,20 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: "Too many login attempts. Please try again in 15 minutes.",
+});
+
+const otpVerifyLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const otpResendLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
 router.get('/login', (req, res) => {
@@ -40,31 +59,107 @@ router.get('/signup', (req, res) => {
 
 router.post('/signup/add', signupLimiter, async (req, res, next) => {
     try {
-        const { name, email, password } = req.body;
-        const id = uuidv4();
-        const role = 'guest';
-        const passwordHash = await bcrypt.hash(password, 12);
+        const name = req.body.name;
+        const email = req.body.email.toLowerCase().trim();
+        const password = req.body.password;
+        
 
-        await db.execute(
-            "INSERT INTO USERS (ID, NAME, EMAIL, PASSWORD, ROLE) VALUES (?, ?, ?, ?, ?)",
-            [id, name, email, passwordHash, role]
+        const [existingUsers] = await db.query(
+            "SELECT ID FROM USERS WHERE EMAIL = ?",
+            [email]
         );
-
-        const user = { ID: id, NAME: name, EMAIL: email, ROLE: role };
-
-        req.login(user, (err) => {
-            if (err) return next(err);
-            req.flash("success", `Welcome to Stayora, ${name}!`);
-            res.redirect('/');
-        });
-    } catch (err) {
-        if (err.code === 'ER_DUP_ENTRY') {
+        if (existingUsers.length > 0) {
             req.flash("error", "This email is already registered. Please login!");
             return res.redirect('/authenticate/signup');
         }
+
+        const id = uuidv4();
+        const role = 'guest';
+        const passwordHash = await bcrypt.hash(password, 12);
+        const otp = crypto.randomInt(100000, 1000000).toString();
+        const hashedOTP = crypto.createHash("sha256").update(otp).digest("hex");
+        const redisKey = `otp:${email}`;
+        const pendingKey = `signup:pending:${email}`;
+        const pendingSignup = JSON.stringify({ id, name, email, passwordHash, role });// redis stores in string/text format
+
+        await redis.set(redisKey, hashedOTP, "EX", 300);
+        await redis.set(pendingKey, pendingSignup, "EX", 300);
+
+        try {
+            await sendOtpEmail(email, otp);
+        } catch (err) {
+            next(err);
+        };
+
+        return res.render('enter-otp', { title: 'Verify OTP', email });
+    } catch (err) {
+        req.flash("error" , "Some error occured please try again");
         next(err);
+    };
+});
+
+router.post('/signup/verify-otp', async (req, res, next) => {
+    try {
+        const SignupEmail = req.body.email.toLowerCase().trim();
+        const otp = req.body.otp;
+        const pendingSignup = await redis.get(`signup:pending:${SignupEmail}`);
+        if (!pendingSignup) { // key expired
+            req.flash("error", "Your session has expired. Please sign up again.");
+            return res.redirect('/authenticate/signup');
+        };
+        const enteredHashOTP = crypto.createHash("sha256").update(otp).digest("hex");
+        const storedOTp = await redis.get(`otp:${SignupEmail}`);
+
+        if( enteredHashOTP !== storedOTp ){// wrong otp entered
+            req.flash("error" , "Incorrect OTP. Please re-enter correct OTP");
+            return res.render('enter-otp' , { title: 'Verify OTP', email: SignupEmail });
+        };
+
+        const StoredSignUp = JSON.parse(pendingSignup);
+        const { id, name,  email, passwordHash, role } = StoredSignUp;
+
+        try {
+            await db.execute( 'INSERT INTO USERS (ID , NAME , EMAIL , PASSWORD , ROLE , IS_VERIFIED) VALUES ( ? , ? , ? , ? , ? , ?)' ,
+             [ id , name , email , passwordHash , role , true ] );
+        }catch( err ){
+            req.flash("error" , "Some error occured please try again");
+            return next(err);
+        };
+
+       res.redirect('/');
+
+    } catch (err) {
+        return next(err);
     }
 });
+
+router.post('/authenticate/signup/resend-otp' , otpResendLimiter , async (req, res, next) => {
+    try {
+        const email = req.body.email.toLowerCase().trim();
+        const pendingSignup = await redis.get(`signup:pending:${email}`);
+        if (!pendingSignup) { // key expired
+            req.flash("error", "Your session has expired. Please sign up again.");
+            return res.redirect('/authenticate/signup');
+        };
+
+        const otp = crypto.randomInt(100000, 1000000).toString();
+        const hashedOTP = crypto.createHash("sha256").update(otp).digest("hex");
+        await redis.set(`otp:${email}`, hashedOTP, "EX", 300);
+
+        try {
+            await sendOtpEmail(email, otp);
+            req.flash("success", "A new OTP has been sent to your email.");
+            return res.render('enter-otp', { title: 'Verify OTP', email });
+        } catch (err) {
+            next(err);
+        };
+    } catch (err) {
+        return next(err);
+    }
+});
+
+
+
 
 router.get('/google', passport.authenticate('google', {
     scope: ['profile', 'email']

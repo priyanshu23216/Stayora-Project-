@@ -115,13 +115,19 @@ router.post('/signup/verify-otp', async (req, res, next) => {
         try {
             await db.execute( 'INSERT INTO USERS (ID , NAME , EMAIL , PASSWORD , ROLE , IS_VERIFIED) VALUES ( ? , ? , ? , ? , ? , ?)' ,
              [ id , name , email , passwordHash , role , true ] );
+             req.login( { ID: id , NAME: name , EMAIL: email , ROLE: role } , (err) => { //serialize the user and create a session for the user 
+                if (err) {
+                    return next(err);
+                };
+                req.flash("success", `Welcome to Stayora, ${name}!`);
+                return res.redirect('/');
+            });
         }catch( err ){
             req.flash("error" , "Some error occured please try again");
             return next(err);
         };
 
-       res.redirect('/');
-
+    
     } catch (err) {
         return next(err);
     }
@@ -165,9 +171,6 @@ router.post('/authenticate/signup/resend-otp' , async (req, res, next) => {
         return next(err);
     }
 });
-
-
-
 
 router.get('/google', passport.authenticate('google', {
     scope: ['profile', 'email']

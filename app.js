@@ -6,6 +6,7 @@ import methodOverride from "method-override";
 import expressLayouts from "express-ejs-layouts";
 import sessionMiddleware from "./config/session.js";
 import flash from "connect-flash";
+import helmet from "helmet";
 
 import db from "./config/db.js";
 import redis from "./config/redis.js";
@@ -22,6 +23,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use(expressLayouts);
 app.set("layout", "layouts/boilerplate.ejs");
 
+app.use(helmet());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

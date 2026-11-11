@@ -1,14 +1,10 @@
 import "dotenv/config";
 import session from "express-session";
 import RedisStore from "connect-redis";
-import redis from "connect-redis";
+import redis from "./redis.js";
 
 const sessionMiddleware = session({
-    store: new RedisStore({
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-        password: process.env.REDIS_PASSWORD
-    }),
+    store: new RedisStore({client: redis}),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,

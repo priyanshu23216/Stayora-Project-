@@ -19,7 +19,7 @@ const signupLimiter = rateLimit({
 });
 
 async function  loginLimiter ( req , res , next ){
-    const redisKey = `login:attempt${req.email}`; // create a unique key for each email address
+    const redisKey = `login:attempt${req.body.email}`; // create a unique key for each email address
 
     const limit = await redis.incr( redisKey );// increment the count of login attempts for this email address in Redis
 
@@ -30,7 +30,7 @@ async function  loginLimiter ( req , res , next ){
 
     if ( limit > 5){// if the user has exceeded the limit of 5 login attempts within 15 minutes, block further attempts and return an error message
         req.flash("error" ,"Too Many login attempts.Please Try Again after 15 minutes");
-        return res.redirect('/login');
+        return res.redirect('/authenticate/login');
     };
 
     return next();
@@ -136,7 +136,7 @@ router.post('/signup/verify-otp', async (req, res, next) => {
     }
 });
 
-router.post('/authenticate/signup/resend-otp' , async (req, res, next) => {
+router.post('/signup/resend-otp' , async (req, res, next) => {
     try {
         const email = req.body.email.toLowerCase().trim();
         const pendingSignup = await redis.get(`signup:pending:${email}`);

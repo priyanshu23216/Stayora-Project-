@@ -7,8 +7,7 @@ import passport from "../config/passport.js";
 import {sendOtpEmail} from "../utils/mailer.js";
 import crypto from "crypto";
 import redis from "../config/redis.js";
-import { json } from 'stream/consumers';
-import { truncateSync } from 'fs';
+
 
 const router = express.Router();
 
@@ -19,20 +18,24 @@ const signupLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: "Too many login attempts. Please try again in 15 minutes.",
-});
+async function  loginLimiter ( req , res , next ){
+    const redisKey = `login:attempt${req.email}`; // create a unique key for each email address
 
-const otpVerifyLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 10,
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    const limit = await redis.incr( redisKey );// increment the count of login attempts for this email address in Redis
+
+
+    if ( limit == 1 ){// if this is the first login attempt for this email address, set an expiration time of 15 minutes for the Redis key
+        await redis.expire( redisKey , 900 );
+    };
+
+    if ( limit > 5){// if the user has exceeded the limit of 5 login attempts within 15 minutes, block further attempts and return an error message
+        req.flash("error" ,"Too Many login attempts.Please Try Again after 15 minutes");
+        return res.redirect('/login');
+    };
+
+    return next();
+};
+
 
 
 router.get('/login', (req, res) => {
@@ -140,6 +143,12 @@ router.post('/authenticate/signup/resend-otp' , async (req, res, next) => {
 
         const limit = `otpResend:${email}`;
 
+        // if user signup time has expired then redirect to signup page with error message
+        if (!pendingSignup) { // key expired
+            req.flash("error", "Your session has expired. Please sign up again.");
+            return res.redirect('/authenticate/signup');
+        };
+
 // Check the number of OTP resend attempts for this email in Redis
         const track = await redis.incr(limit);
         if (track === 1) {
@@ -149,11 +158,7 @@ router.post('/authenticate/signup/resend-otp' , async (req, res, next) => {
             return res.redirect('/authenticate/signup');
         };
 
-// if user signup time has expired then redirect to signup page with error message
-        if (!pendingSignup) { // key expired
-            req.flash("error", "Your session has expired. Please sign up again.");
-            return res.redirect('/authenticate/signup');
-        };
+
 
         // Generate a new OTP, hash it, and store it in Redis with a 5-minute expiration time
         const otp = crypto.randomInt(100000, 1000000).toString();
@@ -182,6 +187,10 @@ router.get('/google/callback', passport.authenticate('google', {
 }), (req, res) => {
     req.flash('success', `Welcome to Stayora, ${req.user.NAME}!`);
     res.redirect('/');
+});
+
+router.get('/forgot-password', (req, res) => {
+    res.render('forgot-password', { title: 'Forgot Password' });
 });
 
 router.get('/logout', (req, res, next) => {

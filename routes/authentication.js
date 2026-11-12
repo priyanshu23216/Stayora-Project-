@@ -57,10 +57,12 @@ router.get('/signup', (req, res) => {
 
 router.post('/signup/add', signupLimiter, async (req, res, next) => {
     try {
-        const name = req.body.name;
-        const email = req.body.email.toLowerCase().trim();
-        const password = req.body.password;
-        
+        // validating input data by zod and regex
+        const result = signupSchema.safeParse( req.body);
+        if( result.success ){ // if its valid then fetch data from result.data instead of re.body coz its more secure and purified clean data 
+        const name = result.data.name;
+        const email = result.data.email;
+        const password = result.data.password;
 
         const [existingUsers] = await db.query(
             "SELECT ID FROM USERS WHERE EMAIL = ?",
@@ -90,6 +92,11 @@ router.post('/signup/add', signupLimiter, async (req, res, next) => {
         };
 
         return res.render('enter-otp', { title: 'Verify OTP', email });
+        }else if ( !result.success){
+            req.flash("error" , result.error.issues[0].message);
+            return res.redirect('/authenticate/signup');
+        };
+
     } catch (err) {
         req.flash("error" , "Some error occured please try again");
         next(err);

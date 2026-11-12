@@ -19,26 +19,25 @@
   </p>
 
   <p>
-    <strong>Stayora</strong> is a production-grade, full-stack hospitality marketplace designed to connect travelers with premium stays and empower property hosts. Built with an Airbnb-inspired philosophy, Stayora balances engineering resilience, transactional data consistency, strict security validations, distributed caching, and seamless reservation workflows.
+    <strong>Stayora</strong> is a production-grade, full-stack hospitality marketplace engineered to bridge the gap between discerning travelers and verified property hosts. Featuring an enterprise-grade 11-table relational database architecture, distributed Redis session caching, strict Zod and regular expression schema sanitization, multi-provider authentication, and transactional email automation.
   </p>
 
 </div>
 
 ---
 
-## 📌 Hospitality Architectural Highlights
+## 📌 Architectural Highlights
 
-- **Multi-Category Hospitality Catalog:** Supports villas, private rooms, vacation apartments, resorts, and boutique stays with dedicated amenity mappings.
-- **Relational Integrity (11 Tables):** MySQL relational backbone with foreign keys, junction tables, and ACID compliance managing users, stays, room inventories, bookings, and verified reviews.
-- **Enterprise Input Validation:** End-to-end payload sanitization via **Zod** combined with strict **Regex** patterns for password complexity (minimum 8 characters, capital & lowercase letters, numbers, and special symbols) and email verification.
-- **High-Performance In-Memory Tier:** Distributed Redis cache and session store using `ioredis` and `connect-redis` with automatic TTL (Time-To-Live) management.
-- **Secure Authentication Pipeline:** 
-  - Local credentials hashed with 12-round `bcrypt` salting.
-  - Google OAuth 2.0 social sign-in powered by Passport.js.
+- **Clean Hospitality Relational Model:** 11-table MySQL schema with foreign keys, cascading integrity rules, and explicit entity relationships across users, properties, room tiers, reviews, and bookings.
+- **Enterprise Input Validation:** Zero unvalidated input policy using **Zod** schemas alongside granular **Regular Expressions (Regex)** for password security (minimum 8 characters, capital & lowercase letters, numbers, and special characters) and email sanitization.
+- **High-Performance In-Memory Tier:** In-memory session persistence and temporary state caching via `ioredis` and `connect-redis` with automatic TTL (Time-To-Live) management.
+- **Secure Authentication Pipeline:**
+  - Local credentials with 12-round `bcrypt` salting.
+  - Google OAuth 2.0 social sign-in via Passport.js.
   - Cryptographic token generation and email OTP verification.
-- **Transactional Hospitality Communications:** Automated guest & host notifications (booking confirmations, cancellations, itinerary updates, and password recovery) dispatched via `nodemailer`.
-- **Cloud Media Pipeline:** Multi-image uploads and CDN asset optimization for properties and room galleries using Multer and Cloudinary.
-- **Security Hardening:** Layered defense with `helmet` HTTP headers, `express-rate-limit` against brute-force and credential stuffing, and encrypted `httpOnly` session cookies.
+- **Transactional Communications:** Automated guest & host emails (booking confirmations, cancellations, itinerary details, and password recovery) dispatched via `nodemailer`.
+- **Media Management:** Cloudinary CDN integration for multi-image uploads for properties and individual room categories.
+- **Security Hardening:** Layered defense with `helmet` HTTP headers, `express-rate-limit` against brute-force attacks, and `httpOnly` secure cookies.
 
 ---
 
@@ -46,16 +45,16 @@
 
 | Table | Purpose |
 |---|---|
-| `USERS` | Manages guest, host, and admin accounts, identity profiles, and role-based permissions. |
-| `HOTELS` / `PROPERTIES` | Stores stay listings, addresses, coordinates, host ownership, and property descriptions. |
-| `HOTEL_IMAGES` | High-resolution property showcase galleries and hero banners. |
-| `ROOMS` | Unit categories, guest capacity, bedroom/bed configurations, and nightly pricing tiers. |
+| `USERS` | Stores guests, hosts, and administrator profiles, credentials, and OAuth identifiers. |
+| `PROPERTIES` | Core stay catalogue (hotels, villas, apartments, cabins) with geolocation, pricing, and descriptions. |
+| `PROPERTY_IMAGES` | High-resolution property showcase galleries and exterior photographs. |
+| `ROOMS` | Unit categories, guest capacities, bed arrangements, and nightly pricing tiers. |
 | `ROOM_IMAGES` | Interior room photographs and virtual tour assets. |
 | `BOOKINGS` | Reservation lifecycles tracking check-in, check-out, guest count, and reservation status. |
 | `REVIEW` | Verified guest ratings, stay feedback, cleanliness scores, and host reviews. |
-| `AMENITIES` | Centralized master catalogue of hospitality amenities (WiFi, Pool, Workspace, Kitchen, etc.). |
-| `HOTEL_AMENITIES` | Junction table mapping property-wide amenities. |
-| `ROOM_AMENITIES` | Junction table mapping room-specific amenities. |
+| `AMENITIES` | Master catalogue of amenities (WiFi, Pool, Dedicated Workspace, Kitchen, etc.). |
+| `PROPERTY_AMENITIES` | Junction table mapping property-wide amenities (`property_id` ➔ `properties.id`). |
+| `ROOM_AMENITIES` | Junction table mapping room-specific amenities (`room_id` ➔ `rooms.id`). |
 | `PAYMENTS` | Transaction logs, currency management, payment gateways, and settlement receipts. |
 
 ---
@@ -64,8 +63,8 @@
 
 ### Frontend & Client Experience
 - **Templating:** EJS (Embedded JavaScript) with `express-ejs-layouts`
-- **Design System:** Airbnb-inspired warm & soft hospitality UI tokens (Plus Jakarta Sans typography, clean glassmorphic sticky navigation)
-- **Client Scripts:** Vanilla JavaScript (ES6+) for interactive carousels, modals, and user dropdowns
+- **Design System:** Airbnb-inspired hospitality UI tokens (Plus Jakarta Sans typography, clean glassmorphic sticky navigation)
+- **Client Scripts:** Vanilla JavaScript (ES6+) for interactive UI components
 
 ### Backend Engineering
 - **Runtime:** Node.js (v20+)
@@ -100,7 +99,7 @@ Stayora/
 │   └── js/                 # Client-side UI interactions
 ├── routes/                 # Modular Express route handlers
 │   ├── auth.js             # Authentication (Signup, Login, OAuth, Recovery)
-│   ├── listings.js         # Stay and property listings CRUD
+│   ├── listings.js         # Property and stay CRUD routes
 │   └── bookings.js         # Reservation lifecycle & booking engine
 ├── views/                  # EJS template views
 │   ├── layouts/            # Master layout (boilerplate.ejs)
@@ -198,7 +197,7 @@ Open **`http://localhost:8080`** in your browser.
 
 ## 📈 Hospitality Engineering Roadmap
 
-- [x] Comprehensive 11-table relational database architecture with foreign keys
+- [x] Comprehensive 11-table relational database architecture with `PROPERTIES`, `ROOMS`, and foreign key cascade rules
 - [x] Redis-backed session store using `connect-redis` + `ioredis`
 - [x] Local authentication with 12-round `bcrypt` salting
 - [x] Google OAuth 2.0 integration
@@ -218,7 +217,7 @@ Open **`http://localhost:8080`** in your browser.
 <div align="center">
 
   <p>
-    <strong>Stayora</strong> - Your Stay, Simplified.
+    <strong>Stayora</strong> — Your Stay, Simplified.
   </p>
 
   <p>
@@ -226,7 +225,7 @@ Open **`http://localhost:8080`** in your browser.
   </p>
 
   <p>
-    <strong>Founder and Developer</strong> - <a href="https://github.com/priyanshu23216" target="_blank"><strong>Priyanshu Singh</strong></a>
+    <strong>Founder and Developer</strong> — <a href="https://github.com/priyanshu23216" target="_blank"><strong>Priyanshu Singh</strong></a>
   </p>
 
 </div>

@@ -7,6 +7,7 @@ import passport from "../config/passport.js";
 import {sendOtpEmail} from "../utils/mailer.js";
 import crypto from "crypto";
 import redis from "../config/redis.js";
+import signupSchema from "../utils/validator.js";
 
 
 const router = express.Router();

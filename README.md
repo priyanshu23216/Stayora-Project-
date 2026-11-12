@@ -24,194 +24,200 @@
 
 ---
 
-## 📌 Table of Contents
-- [About The Project](#-about-the-project)
-- [Key Features](#-key-features)
-- [System Architecture & Flows](#-system-architecture--flows)
-- [Security Engineering](#-security-engineering)
-- [Database Schema (11 Relational Tables)](#-database-schema-11-relational-tables)
-- [Tech Stack](#-tech-stack)
-- [Folder Structure](#-folder-structure)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [API & Route Specifications](#-api--route-specifications)
-- [Project Roadmap](#-project-roadmap)
-- [License & Authors](#-license--authors)
+<h2>📌 About The Project</h2>
 
----
+<p>
+  Stayora aims to connect guests with hotels through a
+  centralized booking platform.
+</p>
 
-## 📌 About The Project
+<p>
+  Users will be able to explore hotel listings, view room
+  details, check amenities, make reservations, and manage
+  their bookings.
+</p>
 
-Stayora connects travelers with hotels and boutique stays through a clean, unified platform designed to handle complex relational business logic: multi-room inventory, dynamic pricing, host listings, verified reviews, and payment processing.
+<p>
+  The platform will support multiple user roles:
+</p>
 
-The platform enforces strict role-based access control (RBAC) across three primary user types:
-1. **Guests:** Browse verified hotel properties, filter by category or amenities, inspect room availability in real-time, execute reservations, and leave verified ratings.
-2. **Hosts:** Register and manage hotel properties, define room categories, manage pricing models, upload multi-angle photo galleries, and track guest check-in/out schedules.
-3. **Admins:** Oversee platform safety, review host verification submissions, manage listings, and audit system integrity.
+<ul>
+  <li><strong>Guest:</strong> Explore hotels and book rooms.</li>
+  <li><strong>Host:</strong> List and manage hotels and rooms.</li>
+  <li><strong>Admin:</strong> Manage and monitor the platform.</li>
+</ul>
 
----
+<h2>🚧 Current Development Progress</h2>
 
-## 🚀 Key Features
+<h3>Database Initialization - Completed</h3>
 
-### 🔐 Authentication & Session Engine
-- **Multi-Provider Logins:** Native Local Strategy with 12-round `bcrypt` password hashing alongside seamless **Google OAuth 2.0** integration.
-- **Two-Factor Email OTP Sign-Up:** Prospective accounts must verify a 6-digit one-time code sent via Nodemailer before account activation.
-- **Distributed Redis Session Store:** Replaces default in-memory sessions with `connect-redis` + `ioredis`, keeping sessions persistent across server restarts, app crashes, and horizontal scale-outs.
-- **Ephemeral Registrations:** Unverified signups are held strictly in Redis with automatic 10-minute TTL expiration, preventing junk or unverified user data from cluttering the MySQL database.
-- **Brute-Force & Flood Protection:** Custom Redis-backed rate limiting per email and IP address to throttle rapid login attempts and OTP resend abuse (max 3 resends / 15 mins).
+<p>
+  The initial MySQL database architecture has been designed
+  and initialized with 11 relational tables.
+</p>
 
-### 🏨 Property, Inventory & Cloud Media *(In Progress)*
-- **Cloudinary CDN Integration:** Efficient, multi-photo file handling buffered in memory through Multer and streamed directly to Cloudinary.
-- **Granular Room Inventories:** Differentiates hotel properties from distinct room tiers (Standard, Deluxe, Penthouse), each with unique capacities, prices, and amenities.
-- **Automated Transactional Emails:** Pre-built responsive HTML email templates for OTP verification, booking confirmations, cancellation receipts, and password resets.
+<h3>Database Structure</h3>
 
----
+<table>
+  <thead>
+    <tr>
+      <th>Table</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>USERS</code></td>
+      <td>Stores guest, host, and admin information.</td>
+    </tr>
+    <tr>
+      <td><code>HOTELS</code></td>
+      <td>Stores hotel details and property information.</td>
+    </tr>
+    <tr>
+      <td><code>HOTEL_IMAGES</code></td>
+      <td>Stores multiple images associated with hotels.</td>
+    </tr>
+    <tr>
+      <td><code>ROOMS</code></td>
+      <td>Manages room categories, capacity, and pricing.</td>
+    </tr>
+    <tr>
+      <td><code>ROOM_IMAGES</code></td>
+      <td>Stores multiple images for room categories.</td>
+    </tr>
+    <tr>
+      <td><code>BOOKINGS</code></td>
+      <td>Stores guest reservations and booking details.</td>
+    </tr>
+    <tr>
+      <td><code>REVIEW</code></td>
+      <td>Stores guest reviews and ratings.</td>
+    </tr>
+    <tr>
+      <td><code>AMENITIES</code></td>
+      <td>Maintains a centralized amenities catalogue.</td>
+    </tr>
+    <tr>
+      <td><code>HOTEL_AMENITIES</code></td>
+      <td>Connects hotels with their amenities.</td>
+    </tr>
+    <tr>
+      <td><code>ROOM_AMENITIES</code></td>
+      <td>Connects room categories with their amenities.</td>
+    </tr>
+    <tr>
+      <td><code>PAYMENTS</code></td>
+      <td>Stores booking payment and transaction records.</td>
+    </tr>
+  </tbody>
+</table>
 
-## 🏛️ System Architecture & Flows
+<h3>Database Design Concepts Implemented</h3>
 
-### User Sign-Up & Redis OTP Verification Flow
-```
-[User Submits Form]
-        │
-        ▼
-[Check Existing Email in MySQL] ──► (Exists) ──► [Flash Error & Redirect]
-        │
-     (New User)
-        ▼
-[Hash Password (Bcrypt) & Generate 6-digit OTP]
-        │
-        ▼
-[Cache SHA-256(OTP) & Pending Data in Redis (TTL: 600s)]
-        │
-        ▼
-[Dispatch HTML Email via Nodemailer] ──► [Render OTP Verification Screen]
-        │
-        ▼
-[User Submits OTP] ──► [Compare SHA-256 Hashes]
-        │
-     (Valid)
-        ▼
-[Commit User to MySQL `USERS` Table] ──► [Passport req.login()] ──► [Redirect to Home]
-```
+<ul>
+  <li>Relational database architecture.</li>
+  <li>Primary keys and foreign key relationships.</li>
+  <li>One-to-many relationships.</li>
+  <li>Many-to-many relationships using junction tables.</li>
+  <li>Unique constraints and data integrity.</li>
+  <li>ENUM and CHECK constraints.</li>
+  <li>Timestamp defaults and automatic updates.</li>
+  <li>Separate hotel and room image management.</li>
+</ul>
 
----
+<h2>🛠️ Technology Stack</h2>
 
-## 🛡️ Security Engineering
+<h3>Frontend</h3>
 
-- **HTTP Protection Headers (`helmet`):** Secures HTTP response headers to protect against Clickjacking, MIME-type sniffing, cross-site scripting (XSS), and disables `X-Powered-By: Express`.
-- **Hashed Ephemeral OTPs:** OTPs are SHA-256 hashed before saving into Redis, ensuring zero plaintext verification secrets exist in Redis memory.
-- **Password Salting:** High-entropy password hashing using `bcrypt` with a cost factor of 12.
-- **SQL Injection Immunization:** 100% prepared parameterized queries via `mysql2/promise` execution protocol (`db.execute`).
-- **Insecure Direct Object Reference (IDOR) Mitigation:** All private resource mutations (bookings, listings, profile updates) strictly check ownership against session context (`req.user.ID`).
-- **Hardened Cookies:** Session cookies configured with `httpOnly: true` (prevents client-side script theft) and environment-aware `secure: true` for HTTPS in production.
+<p>
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white">
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black">
+  <img src="https://img.shields.io/badge/EJS-B4CA65?style=flat-square&logo=ejs&logoColor=black">
+</p>
 
----
+<h3>Backend</h3>
 
-## 🗄️ Database Schema (11 Relational Tables)
+<p>
+  <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white">
+  <img src="https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white">
+</p>
 
-All primary keys throughout the database are non-sequential **UUIDv4** strings, preventing enumeration and ID scraping attacks:
+<h3>Database & Data Storage</h3>
 
-| Table | Description | Key Columns / Constraints |
-|---|---|---|
-| `USERS` | Stores guest, host, and admin profiles. | `ID` (PK, UUID), `EMAIL` (Unique), `PASSWORD`, `ROLE` (`guest`, `host`, `admin`), `GOOGLE_ID`, `IS_VERIFIED` |
-| `HOTELS` | Hotel properties listed on the platform. | `ID` (PK, UUID), `HOST_ID` (FK -> `USERS`), `NAME`, `DESCRIPTION`, `ADDRESS`, `CITY`, `STATE`, `COUNTRY` |
-| `HOTEL_IMAGES` | High-res photo galleries for hotels. | `ID` (PK, UUID), `HOTEL_ID` (FK -> `HOTELS`), `IMAGE_URL`, `IS_PRIMARY` |
-| `ROOMS` | Room categories, capacities, and pricing. | `ID` (PK, UUID), `HOTEL_ID` (FK -> `HOTELS`), `CATEGORY_NAME`, `BASE_PRICE`, `CAPACITY`, `TOTAL_ROOMS` |
-| `ROOM_IMAGES` | Photo galleries dedicated to room categories. | `ID` (PK, UUID), `ROOM_ID` (FK -> `ROOMS`), `IMAGE_URL` |
-| `BOOKINGS` | Reservation records and date intervals. | `ID` (PK, UUID), `USER_ID` (FK -> `USERS`), `ROOM_ID` (FK -> `ROOMS`), `HOTEL_ID` (FK -> `HOTELS`), `CHECK_IN`, `CHECK_OUT`, `STATUS` |
-| `PAYMENTS` | Transaction records for reservations. | `ID` (PK, UUID), `BOOKING_ID` (FK -> `BOOKINGS`), `AMOUNT`, `PAYMENT_METHOD`, `STATUS`, `TRANSACTION_ID` |
-| `REVIEW` | Verified guest ratings and written reviews. | `ID` (PK, UUID), `USER_ID` (FK -> `USERS`), `HOTEL_ID` (FK -> `HOTELS`), `RATING` (1-5), `COMMENT` |
-| `AMENITIES` | Master catalog of facilities. | `ID` (PK, UUID), `NAME` (Unique, e.g., 'Free Wi-Fi', 'Swimming Pool', 'Air Conditioning') |
-| `HOTEL_AMENITIES` | Many-to-Many junction for hotel amenities. | Composite PK (`HOTEL_ID`, `AMENITY_ID`), FKs -> `HOTELS`, `AMENITIES` |
-| `ROOM_AMENITIES` | Many-to-Many junction for room amenities. | Composite PK (`ROOM_ID`, `AMENITY_ID`), FKs -> `ROOMS`, `AMENITIES` |
+<p>
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white">
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white">
+</p>
 
----
+<h3>DevOps & Development Tools</h3>
 
-## 🛠️ Tech Stack
+<p>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white">
+  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white">
+  <img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white">
+</p>
 
-### Core Technologies
-- **Runtime:** Node.js (v20+ LTS, ES Modules `"type": "module"`)
-- **Backend Framework:** Express.js 5.x
-- **Primary Database:** MySQL 8.x via `mysql2/promise` connection pool
-- **Cache & Memory Store:** Redis 6+ via `ioredis`
-- **View Engine:** EJS with `express-ejs-layouts`
+<h3>Additional Libraries & Tools</h3>
 
-### Libraries & Utilities
-- **Authentication:** `passport`, `passport-local`, `passport-google-oauth20`
-- **Security & Sessions:** `express-session`, `connect-redis`, `helmet`, `bcrypt`, `connect-flash`, `express-rate-limit`
-- **Validation:** `zod`
-- **Media & File Handling:** `multer` (memory storage), `cloudinary`
-- **Mailing:** `nodemailer` (Gmail SMTP with custom HTML templates)
-- **Identifiers:** `uuid` (v4)
+<ul>
+  <li>MySQL2</li>
+  <li>UUID</li>
+  <li>Method Override</li>
+  <li>Express Session</li>
+  <li>Bcrypt</li>
+  <li>Dotenv</li>
+</ul>
 
----
+<p>
+  <em>
+    Redis and Docker are planned integrations and have not
+    yet been implemented in the current application.
+  </em>
+</p>
 
-## 📂 Folder Structure
+<h2>🗺️ Planned Features</h2>
 
-```text
-Stayora/
-├── config/
-│   ├── cloudinary.js       # Cloudinary SDK client configuration
-│   ├── db.js               # MySQL connection pool & connection lifecycle
-│   ├── multer.js           # Multer in-memory upload handler & size limits
-│   ├── passport.js         # Local & Google OAuth strategy configurations
-│   ├── redis.js            # ioredis client connection & error listeners
-│   └── session.js          # Express session configuration backed by RedisStore
-├── public/
-│   └── css/                # Global styles, navbar, and footer rules
-├── routes/
-│   └── authentication.js   # Login, signup, OTP, Google OAuth & logout routes
-├── utils/
-│   └── mailer.js           # Branded transactional email templates (OTP, Booking, etc.)
-├── views/
-│   ├── layouts/
-│   │   └── boilerplate.ejs # Master boilerplate with header, alerts, and footer
-│   ├── partials/
-│   │   ├── navbar.ejs      # Dynamic navbar responding to user session state
-│   │   └── footer.ejs      # Standard responsive footer with branding
-│   ├── enter-otp.ejs       # OTP verification view with 60s resend countdown
-│   ├── forgot-password.ejs # Password reset initiation form
-│   ├── index.ejs           # Landing page
-│   ├── login.ejs           # Sign-in form with Google OAuth button
-│   └── signup.ejs          # Registration form with Google OAuth button
-├── app.js                  # Application server entrypoint and middleware pipeline
-├── package.json
-└── README.md
-```
+<ul>
+  <li>User registration, login, and authentication.</li>
+  <li>Role-based access control.</li>
+  <li>Hotel listing and management for hosts.</li>
+  <li>Room category and inventory management.</li>
+  <li>Multiple hotel and room image uploads.</li>
+  <li>Hotel search and filtering.</li>
+  <li>Hotel and room amenities management.</li>
+  <li>Real-time room availability checking.</li>
+  <li>Booking and reservation management.</li>
+  <li>Payment gateway integration.</li>
+  <li>Verified-stay reviews and ratings.</li>
+  <li>Admin dashboard and hotel verification.</li>
+  <li>Redis caching and performance optimization.</li>
+  <li>Docker-based application deployment.</li>
+</ul>
 
----
+<h2>⚙️ Getting Started</h2>
 
-## ⚙️ Getting Started
+<h3>1. Clone the repository</h3>
 
-### Prerequisites
-Make sure you have the following installed locally or accessible via cloud services:
-- [Node.js](https://nodejs.org/) (v20 or higher)
-- [MySQL Server](https://www.mysql.com/) (v8.0+)
-- [Redis Server](https://redis.io/) (Local or managed instance like Upstash/Aiven)
-- [Cloudinary Account](https://cloudinary.com/) (For photo uploads)
+<pre><code>git clone YOUR_GITHUB_REPOSITORY_URL</code></pre>
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/YOUR_USERNAME/Stayora.git
-cd Stayora
-```
+<h3>2. Navigate to the project directory</h3>
 
-### 2. Install dependencies
-```bash
-npm install
-```
+<pre><code>cd Stayora</code></pre>
 
-### 3. Configure environment variables
-Create a `.env` file in the root directory:
-```env
-# Application Server
-PORT=8080
-NODE_ENV=development
-SESSION_SECRET=your_super_secret_session_key
+<h3>3. Install dependencies</h3>
 
-# MySQL Database
-DB_HOST=localhost
-DB_USER=root
+<pre><code>npm install</code></pre>
+
+<h3>4. Configure environment variables</h3>
+
+<p>
+  Create a <code>.env</code> file in the root directory:
+</p>
+
+<pre><code>DB_HOST=localhost
+DB_USER=your_mysql_username
 DB_PASSWORD=your_mysql_password
 DB_NAME=STAYORA
 
@@ -291,16 +297,12 @@ Visit **`http://localhost:8080`** in your browser.
 
 <div align="center">
 
-  <p>
-    <strong>Stayora</strong> — Your Stay, Simplified.
-  </p>
+  <h3>Built with 💻 and ☕</h3>
 
   <p>
     © 2026 Stayora. All rights reserved.
   </p>
 
-  <p>
-    <strong>Founder and CEO</strong> — <a href="https://github.com/PriyanshuSingh-Dev" target="_blank"><strong>Priyanshu Singh</strong></a>
-  </p>
+  <strong>Stayora - Your Stay, Simplified.</strong>
 
 </div>

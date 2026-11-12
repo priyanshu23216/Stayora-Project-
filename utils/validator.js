@@ -18,7 +18,7 @@ export const signupSchema = z.object({
 
 // exporting reset password input pattern to validate new entered pass by user
 
-
+export const resetPassword = z.object({password : passwordRules});
 
 
 

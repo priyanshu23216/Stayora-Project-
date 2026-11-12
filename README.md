@@ -216,7 +216,7 @@ Open **`http://localhost:8080`** in your browser.
 <div align="center">
 
   <p>
-    <strong>Stayora</strong> — Your Stay, Simplified.
+    <strong>Stayora</strong> - Your Stay, Simplified.
   </p>
 
   <p>
@@ -224,7 +224,7 @@ Open **`http://localhost:8080`** in your browser.
   </p>
 
   <p>
-    <strong>Founder and Developer</strong> — <a href="https://github.com/priyanshu23216" target="_blank"><strong>Priyanshu Singh</strong></a>
+    <strong>Founder and Developer</strong> - <a href="https://github.com/priyanshu23216" target="_blank"><strong>Priyanshu Singh</strong></a>
   </p>
 
 </div>

@@ -4,16 +4,19 @@
     <div>
         <label for="name">Name</label>
         <input id="name" name="name" type="text" maxlength="255" autocomplete="name" required>
+        <span class="error-name" style="color: #e53e3e; display: block; margin-top: 5px; font-size: 13px;"></span>
     </div>
 
     <div>
         <label for="email">Email</label>
         <input id="email" name="email" type="email" maxlength="255" autocomplete="email" required>
+        <span class="error-email" style="color: #e53e3e; display: block; margin-top: 5px; font-size: 13px;"></span>
     </div>
 
     <div>
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" maxlength="255" autocomplete="new-password" required>
+        <input id="password" name="password" type="password" maxlength="255" placeholder = "Enter Strong Password " autocomplete="new-password" required>
+        <span class="error-password" style="color: #e53e3e; display: block; margin-top: 5px; font-size: 13px;"></span>
     </div>
 
     <button type="submit">Create account</button>
@@ -27,3 +30,4 @@
         Continue with Google
     </a>
 </div>
+<script src = "../js/validate.js"></script>

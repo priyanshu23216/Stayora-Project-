@@ -2,22 +2,29 @@
 
   <h1>🏨 Stayora</h1>
 
-  <h3>A Modern, Resilient Hotel & Vacation Rental Booking Platform</h3>
+  <h3>A Modern Hotel Booking Platform</h3>
 
   <p>
-    Discover unique hotels, explore room categories, and book your next stay seamlessly.
+    Discover hotels, explore rooms, and book your next stay.
+  </p>
+
+  <img src="https://img.shields.io/badge/Project-Under%20Development-orange?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Backend-Node.js-green?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Database-MySQL-blue?style=for-the-badge">
+
+  <br><br>
+
+  <p>
+    <strong>Stayora</strong> is a hotel booking web application
+    currently under development, designed to provide users
+    with a convenient platform to discover hotels, explore
+    room categories, and manage their reservations.
   </p>
 
   <p>
-    <img src="https://img.shields.io/badge/Status-In%20Active%20Development-orange?style=for-the-badge">
-    <img src="https://img.shields.io/badge/Node.js-20%2B-green?style=for-the-badge&logo=node.js">
-    <img src="https://img.shields.io/badge/Express-5.x-black?style=for-the-badge&logo=express">
-    <img src="https://img.shields.io/badge/MySQL-8.x-blue?style=for-the-badge&logo=mysql">
-    <img src="https://img.shields.io/badge/Redis-6.x-red?style=for-the-badge&logo=redis">
-  </p>
-
-  <p>
-    <strong>Stayora</strong> is a production-focused, full-stack hotel booking platform built with an emphasis on backend engineering, data consistency, high-security authentication, and system scalability. Featuring an 11-table relational database architecture, distributed in-memory caching with Redis, social authentication, and transactional email automation, Stayora provides a reliable bridge between travelers and property hosts.
+    The project focuses on backend engineering, relational
+    database design, authentication, booking management,
+    and building scalable full-stack web applications.
   </p>
 
 </div>
@@ -220,78 +227,51 @@
 DB_USER=your_mysql_username
 DB_PASSWORD=your_mysql_password
 DB_NAME=STAYORA
+PORT=8080</code></pre>
 
-# Redis Configuration
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
+<h3>5. Initialize the database</h3>
 
-# Google OAuth 2.0 Credentials
-GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_CALLBACK_URL=http://localhost:8080/authenticate/google/callback
+<p>
+  Start your MySQL server and create the
+  <code>STAYORA</code> database.
+  Execute the database schema queries to initialize
+  the required tables.
+</p>
 
-# Nodemailer Service (Gmail App Password)
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_16_digit_app_password
+<h3>6. Start the application</h3>
 
-# Cloudinary Storage
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
+<pre><code>node app.js</code></pre>
 
-### 4. Setup Database
-Start your MySQL server and create the database:
-```sql
-CREATE DATABASE STAYORA;
-```
-Execute the DDL schema queries to generate all 11 tables.
+<p>
+  Open <code>http://localhost:8080</code> in your browser.
+</p>
 
-### 5. Start the application
-```bash
-# Start standard Node server
-node app.js
+<h2>📂 Project Goals</h2>
 
-# Or start with live reload (if nodemon is installed)
-npx nodemon app.js
-```
-Visit **`http://localhost:8080`** in your browser.
+<ul>
+  <li>Build a complete hotel booking application.</li>
+  <li>Strengthen backend development fundamentals.</li>
+  <li>Understand relational database design and optimization.</li>
+  <li>Implement secure authentication and authorization.</li>
+  <li>Develop reliable booking and payment workflows.</li>
+  <li>Explore caching, containerization, and deployment.</li>
+</ul>
 
----
+<h2>📈 Project Status</h2>
 
-## 🚦 API & Route Specifications
+<p>
+  <strong>Current Phase:</strong> Database Design Completed.
+</p>
 
-### Authentication Routes (`/authenticate`)
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/authenticate/login` | Renders user login interface. |
-| `POST` | `/authenticate/login/verify` | Authenticates credentials with local strategy & rate-limiting. |
-| `GET` | `/authenticate/signup` | Renders registration form. |
-| `POST` | `/authenticate/signup/add` | Validates input, hashes OTP, sets Redis cache, and emails code. |
-| `POST` | `/authenticate/signup/verify-otp` | Compares OTP hash, creates user in MySQL, and establishes session. |
-| `POST` | `/authenticate/signup/resend-otp` | Re-generates OTP with a 15-minute abuse limit (max 3 resends). |
-| `GET` | `/authenticate/google` | Triggers Google OAuth 2.0 consent screen. |
-| `GET` | `/authenticate/google/callback` | Callback endpoint for Google identity exchange. |
-| `GET` | `/authenticate/forgot-password` | Renders password recovery form. |
-| `GET` | `/authenticate/logout` | Terminates Passport session and clears cookies. |
+<p>
+  <strong>Next Phase:</strong> Backend Architecture and
+  Authentication Implementation.
+</p>
 
----
-
-## 📈 Project Roadmap
-
-- [x] Comprehensive 11-table relational database architecture with UUIDv4 primary keys
-- [x] Redis-backed session store using `connect-redis` + `ioredis`
-- [x] Local email/password authentication with 12-round `bcrypt` salting
-- [x] Google OAuth 2.0 integration
-- [x] Two-factor email OTP account verification with SHA-256 hashing
-- [x] Security hardening: `helmet` HTTP headers, rate limiters, and `httpOnly` cookies
-- [ ] Hotel property listing, editing, and host dashboard routes
-- [ ] Room category inventory management with Cloudinary multi-image uploads
-- [ ] Real-time date-range availability check engine (`CHECK_IN` / `CHECK_OUT`)
-- [ ] Payment gateway integration (Stripe / Razorpay)
-- [ ] Verified-stay review and rating system
-- [ ] Admin management portal and host verification workflow
-- [ ] Docker containerization for one-command deployment
+<p>
+  Stayora is actively being developed, and additional
+  features will be introduced progressively.
+</p>
 
 ---
 
@@ -300,7 +280,8 @@ Visit **`http://localhost:8080`** in your browser.
   <h3>Built with 💻 and ☕</h3>
 
   <p>
-    © 2026 Stayora. All rights reserved.
+    Learning, building, debugging, and improving —
+    one feature at a time.
   </p>
 
   <strong>Stayora - Your Stay, Simplified.</strong>

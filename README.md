@@ -2,14 +2,15 @@
 
   <h1>🏨 Stayora</h1>
 
-  <h3>A Modern, Resilient Hotel & Hospitality Booking Platform</h3>
+  <h3>A Modern, Resilient Hospitality & Accommodation Booking Platform</h3>
 
   <p>
-    Discover unique hotels, explore room categories, and book your next stay seamlessly.
+    Discover curated stays, villas, vacation rentals, boutique hotels, and unforgettable hospitality experiences.
   </p>
 
   <p>
     <img src="https://img.shields.io/badge/Status-In%20Active%20Development-orange?style=for-the-badge">
+    <img src="https://img.shields.io/badge/Domain-Hospitality%20%26%20Travel-6B46C1?style=for-the-badge">
     <img src="https://img.shields.io/badge/Node.js-20%2B-green?style=for-the-badge&logo=node.js">
     <img src="https://img.shields.io/badge/Express-5.x-black?style=for-the-badge&logo=express">
     <img src="https://img.shields.io/badge/MySQL-8.x-blue?style=for-the-badge&logo=mysql">
@@ -18,66 +19,67 @@
   </p>
 
   <p>
-    <strong>Stayora</strong> is a production-focused, full-stack hospitality & hotel booking platform built with an emphasis on backend engineering, data consistency, high-security authentication, and system scalability. Featuring an 11-table relational database architecture, distributed in-memory caching with Redis, enterprise-grade schema validation via Zod & Regex, social authentication, and transactional email automation.
+    <strong>Stayora</strong> is a production-grade, full-stack hospitality marketplace designed to connect travelers with premium stays and empower property hosts. Built with an Airbnb-inspired philosophy, Stayora balances engineering resilience, transactional data consistency, strict security validations, distributed caching, and seamless reservation workflows.
   </p>
 
 </div>
 
 ---
 
-## 📌 Architectural Highlights
+## 📌 Hospitality Architectural Highlights
 
-- **Relational Integrity:** 11-table MySQL schema with foreign keys, junction tables, and strict constraints for users, hotels, rooms, reviews, bookings, and amenities.
-- **Enterprise Input Validation:** End-to-end schema validation powered by **Zod** and granular **Regular Expressions (Regex)** for password complexity (minimum 8 characters, capital & lowercase letters, numbers, and special characters) and email sanitization.
-- **Session & Caching Layer:** Distributed session store and temporary token caching using `ioredis` and `connect-redis` with automatic TTL (Time-To-Live) expiration.
-- **Robust Authentication:** Multi-layered auth pipeline supporting:
-  - Local credentials with 12-round `bcrypt` salting.
-  - Google OAuth 2.0 via Passport.js.
-  - Cryptographic password recovery and email OTP flows.
-- **Transactional Email Automation:** Dynamic notifications (welcome emails, booking confirmations, cancellation notices, and password reset flows) using `nodemailer`.
-- **Media Management:** Cloudinary CDN integration for multi-image uploads for hotel properties and individual room categories.
-- **Security Hardening:** Layered defense using `helmet` HTTP headers, `express-rate-limit` against brute-force attacks, and `httpOnly` secure cookies.
+- **Multi-Category Hospitality Catalog:** Supports villas, private rooms, vacation apartments, resorts, and boutique stays with dedicated amenity mappings.
+- **Relational Integrity (11 Tables):** MySQL relational backbone with foreign keys, junction tables, and ACID compliance managing users, stays, room inventories, bookings, and verified reviews.
+- **Enterprise Input Validation:** End-to-end payload sanitization via **Zod** combined with strict **Regex** patterns for password complexity (minimum 8 characters, capital & lowercase letters, numbers, and special symbols) and email verification.
+- **High-Performance In-Memory Tier:** Distributed Redis cache and session store using `ioredis` and `connect-redis` with automatic TTL (Time-To-Live) management.
+- **Secure Authentication Pipeline:** 
+  - Local credentials hashed with 12-round `bcrypt` salting.
+  - Google OAuth 2.0 social sign-in powered by Passport.js.
+  - Cryptographic token generation and email OTP verification.
+- **Transactional Hospitality Communications:** Automated guest & host notifications (booking confirmations, cancellations, itinerary updates, and password recovery) dispatched via `nodemailer`.
+- **Cloud Media Pipeline:** Multi-image uploads and CDN asset optimization for properties and room galleries using Multer and Cloudinary.
+- **Security Hardening:** Layered defense with `helmet` HTTP headers, `express-rate-limit` against brute-force and credential stuffing, and encrypted `httpOnly` session cookies.
 
 ---
 
-## 🚧 Database Architecture (11 Relational Tables)
+## 🚧 Hospitality Database Architecture (11 Relational Tables)
 
 | Table | Purpose |
 |---|---|
-| `USERS` | Stores guests, hosts, and administrator credentials and profiles. |
-| `HOTELS` | Stores property descriptions, locations, and host associations. |
-| `HOTEL_IMAGES` | Multi-image support for hotel properties. |
-| `ROOMS` | Manages room tiers, inventory count, capacity, and nightly pricing. |
-| `ROOM_IMAGES` | Multiple high-resolution images for specific room categories. |
-| `BOOKINGS` | Reservation lifecycles with check-in/out dates and booking states. |
-| `REVIEW` | Verified guest ratings, reviews, and feedback. |
-| `AMENITIES` | Centralized master catalogue of amenities (WiFi, Pool, AC, etc.). |
-| `HOTEL_AMENITIES` | Junction table mapping amenities to specific hotel properties. |
-| `ROOM_AMENITIES` | Junction table mapping amenities to individual room categories. |
-| `PAYMENTS` | Transaction records, payment statuses, and gateway references. |
+| `USERS` | Manages guest, host, and admin accounts, identity profiles, and role-based permissions. |
+| `HOTELS` / `PROPERTIES` | Stores stay listings, addresses, coordinates, host ownership, and property descriptions. |
+| `HOTEL_IMAGES` | High-resolution property showcase galleries and hero banners. |
+| `ROOMS` | Unit categories, guest capacity, bedroom/bed configurations, and nightly pricing tiers. |
+| `ROOM_IMAGES` | Interior room photographs and virtual tour assets. |
+| `BOOKINGS` | Reservation lifecycles tracking check-in, check-out, guest count, and reservation status. |
+| `REVIEW` | Verified guest ratings, stay feedback, cleanliness scores, and host reviews. |
+| `AMENITIES` | Centralized master catalogue of hospitality amenities (WiFi, Pool, Workspace, Kitchen, etc.). |
+| `HOTEL_AMENITIES` | Junction table mapping property-wide amenities. |
+| `ROOM_AMENITIES` | Junction table mapping room-specific amenities. |
+| `PAYMENTS` | Transaction logs, currency management, payment gateways, and settlement receipts. |
 
 ---
 
 ## 🛠️ Technology Stack
 
-### Frontend
+### Frontend & Client Experience
 - **Templating:** EJS (Embedded JavaScript) with `express-ejs-layouts`
-- **Styling:** Custom CSS3 with Airbnb-inspired hospitality design tokens (Plus Jakarta Sans)
-- **Client Scripts:** Vanilla JavaScript (ES6+) for interactive UI components
+- **Design System:** Airbnb-inspired warm & soft hospitality UI tokens (Plus Jakarta Sans typography, clean glassmorphic sticky navigation)
+- **Client Scripts:** Vanilla JavaScript (ES6+) for interactive carousels, modals, and user dropdowns
 
-### Backend
+### Backend Engineering
 - **Runtime:** Node.js (v20+)
 - **Framework:** Express.js (v5.x)
-- **Validation:** **Zod** schema validation + **Regex** pattern matching
+- **Validation Engine:** **Zod** schema validation + **Regex** pattern enforcement
 - **Authentication:** Passport.js (`passport-local`, `passport-google-oauth20`), `bcrypt`
-- **Session Management:** `express-session`, `connect-redis`, `ioredis`
-- **Security:** `helmet`, `express-rate-limit`
-- **File Uploads:** `multer`, `cloudinary`
-- **Mailing:** `nodemailer`
+- **Session Store:** `express-session`, `connect-redis`, `ioredis`
+- **Security & Protection:** `helmet`, `express-rate-limit`
+- **Storage & CDN:** `multer`, `cloudinary`
+- **Email Engine:** `nodemailer`
 
-### Database & In-Memory Store
+### Data Storage & In-Memory Layer
 - **Relational DB:** MySQL 8.x (`mysql2`)
-- **Key-Value Cache:** Redis (`ioredis`)
+- **Cache & TTL Store:** Redis (`ioredis`)
 
 ---
 
@@ -85,29 +87,29 @@
 
 ```text
 Stayora/
-├── config/                 # Infrastructure and third-party service configs
-│   ├── cloudinary.js       # Cloudinary SDK initialization
-│   ├── db.js               # MySQL connection pool
-│   ├── passport.js         # Passport authentication strategies (Local, Google)
-│   ├── redis.js            # Redis client configuration
-│   └── sendermail.js       # Nodemailer transporter and transactional email templates
+├── config/                 # Service initializations & cloud integrations
+│   ├── cloudinary.js       # Cloudinary asset storage config
+│   ├── db.js               # MySQL connection pool configuration
+│   ├── passport.js         # Local & Google OAuth authentication strategies
+│   ├── redis.js            # Redis client & cache settings
+│   └── sendermail.js       # Transactional email templates & transporter
 ├── utils/                  # Reusable utilities and validators
 │   └── validation.js       # Zod schemas & Regex rules for signup, login, and reset
 ├── public/                 # Static assets
-│   ├── css/                # Component styles (navbar.css, footer.css, etc.)
-│   └── js/                 # Client-side scripts
-├── routes/                 # Express route handlers
-│   ├── auth.js             # Authentication routes (login, signup, OAuth, reset)
-│   ├── listings.js         # Hotel & room listing management
-│   └── bookings.js         # Reservation lifecycle routes
-├── views/                  # EJS templates
+│   ├── css/                # Hospitality design system (navbar.css, footer.css, etc.)
+│   └── js/                 # Client-side UI interactions
+├── routes/                 # Modular Express route handlers
+│   ├── auth.js             # Authentication (Signup, Login, OAuth, Recovery)
+│   ├── listings.js         # Stay and property listings CRUD
+│   └── bookings.js         # Reservation lifecycle & booking engine
+├── views/                  # EJS template views
 │   ├── layouts/            # Master layout (boilerplate.ejs)
-│   ├── partials/           # Shared components (navbar.ejs, footer.ejs)
-│   ├── forgot-password.ejs # Password recovery interface
+│   ├── partials/           # Reusable components (navbar.ejs, footer.ejs)
+│   ├── forgot-password.ejs # Password recovery view
 │   ├── enter-otp.ejs       # Verification view
 │   ├── login.ejs           # Sign-in view
 │   └── signup.ejs          # Registration view
-├── app.js                  # Application server entrypoint and middleware pipeline
+├── app.js                  # Application entry point & middleware pipeline
 ├── package.json
 └── README.md
 ```
@@ -119,7 +121,7 @@ Stayora/
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v20 or higher)
 - [MySQL Server](https://www.mysql.com/) (v8.0+)
-- [Redis Server](https://redis.io/) (Local or cloud-hosted)
+- [Redis Server](https://redis.io/) (Local or cloud instance)
 
 ### 1. Clone the repository
 ```bash
@@ -166,49 +168,49 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 ### 4. Run the Application
 ```bash
-# Using nodemon for hot-reloading
+# Development mode with hot-reloading
 npx nodemon app.js
 
-# Or standard Node
+# Production start
 node app.js
 ```
 Open **`http://localhost:8080`** in your browser.
 
 ---
 
-## 🚦 API & Route Specifications
+## 🚦 Hospitality API & Route Specifications
 
 ### Authentication & Account Recovery (`/authenticate`)
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/authenticate/login` | Renders user login interface. |
+| `GET` | `/authenticate/login` | Renders user sign-in portal. |
 | `POST` | `/authenticate/login/verify` | Authenticates credentials with local strategy & rate-limiting. |
-| `GET` | `/authenticate/signup` | Renders registration form with Zod/Regex criteria. |
+| `GET` | `/authenticate/signup` | Renders guest/host registration form. |
 | `POST` | `/authenticate/signup/add` | Validates input via Zod schema, sends OTP, and caches state in Redis. |
-| `POST` | `/authenticate/signup/verify-otp` | Compares OTP, creates user in MySQL, and establishes session. |
-| `GET` | `/authenticate/google` | Triggers Google OAuth 2.0 consent screen. |
-| `GET` | `/authenticate/google/callback` | Callback endpoint for Google identity exchange. |
+| `POST` | `/authenticate/signup/verify-otp` | Compares OTP, creates user record in MySQL, and establishes session. |
+| `GET` | `/authenticate/google` | Triggers Google OAuth 2.0 consent flow. |
+| `GET` | `/authenticate/google/callback` | OAuth callback endpoint exchanging tokens for user profile. |
 | `GET` | `/authenticate/forgot-password` | Renders password recovery form. |
 | `POST` | `/authenticate/forgot-password` | Generates secure cryptographic reset token and dispatches email. |
-| `GET` | `/authenticate/logout` | Terminates Passport session and clears cookies. |
+| `GET` | `/authenticate/logout` | Terminates Passport session and purges cookies. |
 
 ---
 
-## 📈 Project Roadmap
+## 📈 Hospitality Engineering Roadmap
 
 - [x] Comprehensive 11-table relational database architecture with foreign keys
 - [x] Redis-backed session store using `connect-redis` + `ioredis`
-- [x] Local email/password authentication with 12-round `bcrypt` salting
+- [x] Local authentication with 12-round `bcrypt` salting
 - [x] Google OAuth 2.0 integration
 - [x] Enterprise input validation using **Zod** and strict **Regex** patterns
 - [x] Security hardening: `helmet` HTTP headers, rate limiters, and `httpOnly` cookies
 - [x] Transactional email automation using `nodemailer`
-- [ ] Responsive Airbnb-style navigation bar & global footer
-- [ ] Hotel property listing, editing, and host dashboard routes
+- [ ] Airbnb-inspired responsive hospitality navbar & global footer
+- [ ] Host listing portal: Multi-step stay creation & pricing manager
 - [ ] Room category inventory management with Cloudinary multi-image uploads
 - [ ] Real-time date-range availability check engine (`CHECK_IN` / `CHECK_OUT`)
 - [ ] Payment gateway integration (Stripe / Razorpay)
-- [ ] Verified-stay review and rating system
+- [ ] Verified guest review and rating system
 - [ ] Admin management portal and host verification workflow
 
 ---

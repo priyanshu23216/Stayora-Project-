@@ -217,7 +217,7 @@ Open **`http://localhost:8080`** in your browser.
 <div align="center">
 
   <p>
-    <strong>Stayora</strong> — Your Stay, Simplified.
+    <strong>Stayora</strong> - Your Stay, Simplified.
   </p>
 
   <p>

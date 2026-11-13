@@ -29,15 +29,16 @@
 ## 📌 Architectural Highlights
 
 - **Clean Hospitality Relational Model:** 11-table MySQL schema with foreign keys, cascading integrity rules, and explicit entity relationships across users, properties, room tiers, reviews, and bookings.
-- **Enterprise Input Validation:** Zero unvalidated input policy using **Zod** schemas alongside granular **Regular Expressions (Regex)** for password security (minimum 8 characters, capital & lowercase letters, numbers, and special characters) and email sanitization.
+- **Enterprise Input Validation:** Dual-layer defense with client-side real-time validation and backend **Zod** schemas alongside granular **Regular Expressions (Regex)** for password security (minimum 8 characters, capital & lowercase letters, numbers, and special characters) and email sanitization.
 - **High-Performance In-Memory Tier:** In-memory session persistence and temporary state caching via `ioredis` and `connect-redis` with automatic TTL (Time-To-Live) management.
 - **Secure Authentication Pipeline:**
   - Local credentials with 12-round `bcrypt` salting.
   - Google OAuth 2.0 social sign-in via Passport.js.
   - Cryptographic token generation and email OTP verification.
+  - Hybrid rate limiting (Express Rate Limiter + custom Redis-backed attempt counters for brute-force mitigation).
 - **Transactional Communications:** Automated guest & host emails (booking confirmations, cancellations, itinerary details, and password recovery) dispatched via `nodemailer`.
-- **Media Management:** Cloudinary CDN integration for multi-image uploads for properties and individual room categories.
-- **Security Hardening:** Layered defense with `helmet` HTTP headers, `express-rate-limit` against brute-force attacks, and `httpOnly` secure cookies.
+- **Media Management:** Cloudinary CDN and Multer integration for multi-image uploads for properties and individual room categories.
+- **Security Hardening:** Layered defense with `helmet` HTTP headers, `express-rate-limit`, secure session cookies, and flash notifications.
 
 ---
 
@@ -64,15 +65,15 @@
 ### Frontend & Client Experience
 - **Templating:** EJS (Embedded JavaScript) with `express-ejs-layouts`
 - **Design System:** Airbnb-inspired hospitality UI tokens (Plus Jakarta Sans typography, clean glassmorphic sticky navigation)
-- **Client Scripts:** Vanilla JavaScript (ES6+) for interactive UI components
+- **Client Scripts:** Vanilla JavaScript (ES6+) for interactive UI components and client-side form validation (`validate.js`)
 
 ### Backend Engineering
-- **Runtime:** Node.js (v20+)
+- **Runtime:** Node.js (v20+, ES Modules)
 - **Framework:** Express.js (v5.x)
 - **Validation Engine:** **Zod** schema validation + **Regex** pattern enforcement
 - **Authentication:** Passport.js (`passport-local`, `passport-google-oauth20`), `bcrypt`
 - **Session Store:** `express-session`, `connect-redis`, `ioredis`
-- **Security & Protection:** `helmet`, `express-rate-limit`
+- **Security & Protection:** `helmet`, `express-rate-limit`, `connect-flash`
 - **Storage & CDN:** `multer`, `cloudinary`
 - **Email Engine:** `nodemailer`
 
@@ -89,25 +90,28 @@ Stayora/
 ├── config/                 # Service initializations & cloud integrations
 │   ├── cloudinary.js       # Cloudinary asset storage config
 │   ├── db.js               # MySQL connection pool configuration
+│   ├── multer.js           # Multer storage configuration for uploads
 │   ├── passport.js         # Local & Google OAuth authentication strategies
 │   ├── redis.js            # Redis client & cache settings
-│   └── sendermail.js       # Transactional email templates & transporter
+│   └── session.js          # Express-session & RedisStore integration
+├── routes/                 # Modular Express route handlers
+│   └── authentication.js   # Authentication (Signup, Login, OTP, OAuth, Recovery)
 ├── utils/                  # Reusable utilities and validators
-│   └── validation.js       # Zod schemas & Regex rules for signup, login, and reset
+│   ├── mailer.js           # Transactional email templates & nodemailer transporter
+│   └── validator.js        # Zod schemas & Regex rules for signup, login, and reset
 ├── public/                 # Static assets
 │   ├── css/                # Hospitality design system (navbar.css, footer.css, etc.)
-│   └── js/                 # Client-side UI interactions
-├── routes/                 # Modular Express route handlers
-│   ├── auth.js             # Authentication (Signup, Login, OAuth, Recovery)
-│   ├── listings.js         # Property and stay CRUD routes
-│   └── bookings.js         # Reservation lifecycle & booking engine
+│   └── js/                 # Client-side UI interactions (validate.js)
 ├── views/                  # EJS template views
 │   ├── layouts/            # Master layout (boilerplate.ejs)
 │   ├── partials/           # Reusable components (navbar.ejs, footer.ejs)
+│   ├── enter-otp.ejs       # OTP verification view
 │   ├── forgot-password.ejs # Password recovery view
-│   ├── enter-otp.ejs       # Verification view
+│   ├── index.ejs           # Landing page
 │   ├── login.ejs           # Sign-in view
 │   └── signup.ejs          # Registration view
+├── .env.example            # Example environment configuration
+├── .gitignore              # Git ignore patterns (node_modules, .env)
 ├── app.js                  # Application entry point & middleware pipeline
 ├── package.json
 └── README.md
@@ -134,7 +138,12 @@ npm install
 ```
 
 ### 3. Setup Environment Variables
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory by copying from `.env.example`:
+```bash
+cp .env.example .env
+```
+
+Configure your credentials inside `.env`:
 ```env
 PORT=8080
 NODE_ENV=development
@@ -183,9 +192,9 @@ Open **`http://localhost:8080`** in your browser.
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/authenticate/login` | Renders user sign-in portal. |
-| `POST` | `/authenticate/login/verify` | Authenticates credentials with local strategy & rate-limiting. |
+| `POST` | `/authenticate/login/verify` | Authenticates credentials with local strategy & Redis rate-limiting. |
 | `GET` | `/authenticate/signup` | Renders guest/host registration form. |
-| `POST` | `/authenticate/signup/add` | Validates input via Zod schema, sends OTP, and caches state in Redis. |
+| `POST` | `/authenticate/signup/add` | Validates input via Zod schema & regex, sends OTP, and caches state in Redis. |
 | `POST` | `/authenticate/signup/verify-otp` | Compares OTP, creates user record in MySQL, and establishes session. |
 | `GET` | `/authenticate/google` | Triggers Google OAuth 2.0 consent flow. |
 | `GET` | `/authenticate/google/callback` | OAuth callback endpoint exchanging tokens for user profile. |
@@ -201,10 +210,10 @@ Open **`http://localhost:8080`** in your browser.
 - [x] Redis-backed session store using `connect-redis` + `ioredis`
 - [x] Local authentication with 12-round `bcrypt` salting
 - [x] Google OAuth 2.0 integration
-- [x] Enterprise input validation using **Zod** and strict **Regex** patterns
-- [x] Security hardening: `helmet` HTTP headers, rate limiters, and `httpOnly` cookies
+- [x] Enterprise input validation using **Zod** and strict **Regex** patterns (client + server side)
+- [x] Security hardening: `helmet` HTTP headers, Redis/Express rate limiters, and `httpOnly` cookies
 - [x] Transactional email automation using `nodemailer`
-- [ ] Airbnb-inspired responsive hospitality navbar & global footer
+- [x] Airbnb-inspired responsive hospitality navbar & global footer partials
 - [ ] Host listing portal: Multi-step stay creation & pricing manager
 - [ ] Room category inventory management with Cloudinary multi-image uploads
 - [ ] Real-time date-range availability check engine (`CHECK_IN` / `CHECK_OUT`)

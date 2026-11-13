@@ -7,7 +7,7 @@ import passport from "../config/passport.js";
 import {sendOtpEmail} from "../utils/mailer.js";
 import crypto from "crypto";
 import redis from "../config/redis.js";
-import {signupSchema , loginCheck , resetPassword }from "../utils/validator.js";
+import {signupSchema , loginCheck , resetPassword ,  otpValidator }from "../utils/validator.js";
 
 
 
@@ -114,9 +114,14 @@ router.post('/signup/add', signupLimiter, async (req, res, next) => {
 });
 
 router.post('/signup/verify-otp', async (req, res, next) => {
+    const result = otpValidator.safeParse( req.body );
     try {
-        const SignupEmail = req.body.email.toLowerCase().trim();
-        const otp = req.body.otp;
+        if ( !result.success ){
+            req.flash( "error" , result.error.issues[0].message);
+            return res.redirect('/authenticate/signup');
+        };
+        const SignupEmail = result.data.email;
+        const otp = result.data.otp;
         const pendingSignup = await redis.get(`signup:pending:${SignupEmail}`);
         if (!pendingSignup) { // key expired
             req.flash("error", "Your session has expired. Please sign up again.");
@@ -155,7 +160,16 @@ router.post('/signup/verify-otp', async (req, res, next) => {
 });
 
 router.post('/signup/resend-otp' , async (req, res, next) => {
+    const result = otpValidator.safeParse( req.body );
     try {
+        if( !result.success ){
+            if( result.error.issues[0].path == "otp" ){
+                return res.render('enter-otp' , {email : req.body.email.toLowerCase().trim() , title : "Verify-OTP" , error : [ result.error.issues[0].message ] } );
+            } else {
+                req.flash( "error" , result.error.issues[0].message);
+                return res.redirect('/authenticate/signup');
+        }
+    };
         const email = req.body.email.toLowerCase().trim();
         const pendingSignup = await redis.get(`signup:pending:${email}`);
 
@@ -188,7 +202,7 @@ router.post('/signup/resend-otp' , async (req, res, next) => {
             req.flash("success", "A new OTP has been sent to your email.");
             return res.render('enter-otp', { title: 'Verify OTP', email });
         } catch (err) {
-            next(err);
+            return next(err);
         };
     } catch (err) {
         return next(err);

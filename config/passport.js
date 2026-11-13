@@ -35,9 +35,10 @@ passport.use(
         async (email, password, done) => {
             try {
                 // check if the user exists in the database by email
+                const emailCleaned = email.toLowerCase().trim(); // Normalize the email to lowercase and trim whitespace
                 const [result] = await db.query(
                     "SELECT * FROM USERS WHERE EMAIL = ?",
-                    [email]
+                    [emailCleaned]
                 );
                 const user = result[0];
 
@@ -45,7 +46,7 @@ passport.use(
 
                 if (!user) {
                     return done(null, false, { message: "Invalid email or password" });
-                }
+                };
                 // If the user is found but does not have a password (e.g., registered via Google/GitHub), return an error message
 
                 if (!user.PASSWORD) {
@@ -55,8 +56,8 @@ passport.use(
 
                 const isMatch = await bcrypt.compare(password, user.PASSWORD);
                 if (!isMatch) {
-                    return done(null, false, { message: "Wrong email or password" });
-                }
+                    return done(null, false, { message: "Invalid email or password" });
+                };
 
                 return done(null, user);
             } catch (err) {
@@ -83,13 +84,13 @@ passport.use(
                 );
                 if (user.length > 0) {
                     return done(null, user[0]);
-                }
+                };
                 // If the user is not found by Google ID, check if the email exists in the database
 
                 let email = null;
 
                 if ( profile.emails && profile.emails.length>0){
-                    email = profile.emails[0].value;
+                    email = profile.emails[0].value.toLowerCase().trim(); // Normalize the email to lowercase and trim Extraspaces
                 };
                 if (email) { // If email is found, check if it exists in the database
             const [usersByEmail] = await db.query("SELECT ID, NAME, EMAIL, ROLE FROM USERS WHERE EMAIL = ?", [email] );     
@@ -118,7 +119,7 @@ passport.use(
                 
                 const role = "guest"; // Default role for new users
 
-    await db.execute( "INSERT INTO USERS (ID, NAME, EMAIL, GOOGLE_ID, ROLE) VALUES (?, ?, ?, ?, ?)",[id, name, email, profile.id, role] );
+    await db.execute( "INSERT INTO USERS (ID, NAME, EMAIL, GOOGLE_ID, ROLE , IS_VERIFIED) VALUES (?, ?, ?, ?, ? , ?)",[id, name, email, profile.id, role , 1] );
                 const newUser = { ID: id, NAME: name, EMAIL: email, ROLE: role };
                 return done(null, newUser);
             } catch (err) {

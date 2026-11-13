@@ -7,7 +7,8 @@ import passport from "../config/passport.js";
 import {sendOtpEmail} from "../utils/mailer.js";
 import crypto from "crypto";
 import redis from "../config/redis.js";
-import signupSchema from "../utils/validator.js";
+import {signupSchema , loginCheck , resetPassword }from "../utils/validator.js";
+
 
 
 const router = express.Router();
@@ -20,7 +21,14 @@ const signupLimiter = rateLimit({
 });
 
 async function  loginLimiter ( req , res , next ){
-    const redisKey = `login:attempt${req.body.email}`; // create a unique key for each email address
+    let result = loginCheck.safeParse( req.body );
+    try {
+        if( !result.success ){
+        req.flash("error" , "Invalid Email and Password");
+        return res.redirect('/authenticate/login');
+    };
+    const email = result.data.email;
+    const redisKey = `login:attempts:${email}`; // create a unique key for each email address
 
     const limit = await redis.incr( redisKey );// increment the count of login attempts for this email address in Redis
 
@@ -33,8 +41,10 @@ async function  loginLimiter ( req , res , next ){
         req.flash("error" ,"Too Many login attempts.Please Try Again after 15 minutes");
         return res.redirect('/authenticate/login');
     };
-
     return next();
+    }catch( err ){
+        return next( err );
+    };
 };
 
 
@@ -61,7 +71,7 @@ router.post('/signup/add', signupLimiter, async (req, res, next) => {
         const result = signupSchema.safeParse( req.body);
         if( result.success ){ // if its valid then fetch data from result.data instead of re.body coz its more secure and purified clean data 
         const name = result.data.name;
-        const email = result.data.email;
+        const email = result.data.email;;
         const password = result.data.password;
 
         const [existingUsers] = await db.query(
@@ -88,7 +98,7 @@ router.post('/signup/add', signupLimiter, async (req, res, next) => {
         try {
             await sendOtpEmail(email, otp);
         } catch (err) {
-            next(err);
+           return  next(err);
         };
 
         return res.render('enter-otp', { title: 'Verify OTP', email });
@@ -99,7 +109,7 @@ router.post('/signup/add', signupLimiter, async (req, res, next) => {
 
     } catch (err) {
         req.flash("error" , "Some error occured please try again");
-        next(err);
+       return next(err);
     };
 });
 

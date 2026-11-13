@@ -108,7 +108,6 @@ router.post('/signup/add', signupLimiter, async (req, res, next) => {
         };
 
     } catch (err) {
-        req.flash("error" , "Some error occured please try again");
        return next(err);
     };
 });
@@ -116,10 +115,14 @@ router.post('/signup/add', signupLimiter, async (req, res, next) => {
 router.post('/signup/verify-otp', async (req, res, next) => {
     const result = otpValidator.safeParse( req.body );
     try {
-        if ( !result.success ){
-            req.flash( "error" , result.error.issues[0].message);
-            return res.redirect('/authenticate/signup');
-        };
+        if( !result.success ){
+            if( result.error.issues[0].path == "otp" ){
+                return res.render('enter-otp' , {email : req.body.email.toLowerCase().trim() , title : "Verify-OTP" , error : [ result.error.issues[0].message ] } );
+            } else {
+                req.flash( "error" , result.error.issues[0].message);
+                return res.redirect('/authenticate/signup');
+        }
+    };
         const SignupEmail = result.data.email;
         const otp = result.data.otp;
         const pendingSignup = await redis.get(`signup:pending:${SignupEmail}`);
@@ -131,8 +134,7 @@ router.post('/signup/verify-otp', async (req, res, next) => {
         const storedOTp = await redis.get(`otp:${SignupEmail}`);
 
         if( enteredHashOTP !== storedOTp ){// wrong otp entered
-            req.flash("error" , "Incorrect OTP. Please re-enter correct OTP");
-            return res.render('enter-otp' , { title: 'Verify OTP', email: SignupEmail });
+            return res.render('enter-otp' , { title: 'Verify OTP', email: SignupEmail , error : ["Incorrect OTP ,Please re-enter correct OTP"] });
         };
 
         const StoredSignUp = JSON.parse(pendingSignup);
@@ -149,7 +151,6 @@ router.post('/signup/verify-otp', async (req, res, next) => {
                 return res.redirect('/');
             });
         }catch( err ){
-            req.flash("error" , "Some error occured please try again");
             return next(err);
         };
 
@@ -160,16 +161,7 @@ router.post('/signup/verify-otp', async (req, res, next) => {
 });
 
 router.post('/signup/resend-otp' , async (req, res, next) => {
-    const result = otpValidator.safeParse( req.body );
     try {
-        if( !result.success ){
-            if( result.error.issues[0].path == "otp" ){
-                return res.render('enter-otp' , {email : req.body.email.toLowerCase().trim() , title : "Verify-OTP" , error : [ result.error.issues[0].message ] } );
-            } else {
-                req.flash( "error" , result.error.issues[0].message);
-                return res.redirect('/authenticate/signup');
-        }
-    };
         const email = req.body.email.toLowerCase().trim();
         const pendingSignup = await redis.get(`signup:pending:${email}`);
 

@@ -187,7 +187,7 @@ export const sendBookingConfirmation = async (toEmail, booking) => {
 
 export const sendBookingCancellation = async (toEmail, booking) => {
     const mailOptions = {
-        from: `"Stayora" : <${process.env.EMAIL_USER}>`,
+        from: `"Stayora" <${process.env.EMAIL_USER}>`,
         to: toEmail,
         subject: `Booking Cancelled: ${booking.hotelName} (${booking.bookingId})`,
         html: 

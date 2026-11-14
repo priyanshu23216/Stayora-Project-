@@ -289,12 +289,12 @@ router.post('/forgot-password/submit', forgotPassIPlimiter ,forgotPassEmailLimit
         const [arr] = await db.query('SELECT ID , PASSWORD FROM USERS WHERE EMAIL = ?' , [email]);
         const user = arr[0];
         if ( !user ){// if email not found in database then send same message to user to prevent email enumeration attacks
-            req.flash("success" , "If email exists thenOTP has been sent to your email for password reset.");
+            req.flash("success" , "If email exists then OTP has been sent to your email for password reset.");
             return res.redirect('/authenticate/forgot-password')
         }
         if( !user.PASSWORD ) { // if user has signed up via Google then send message to user that he/she cannot reset password
             req.flash("success" , "If email exists thenOTP has been sent to your email for password reset.");
-             await resetPass( email , "Your Stayora account uses Google Sign-In, so there's no password to reset. Use Continue with Google to log in." );
+             await resetPassEmail( email , "Your Stayora account uses Google Sign-In, so there's no password to reset. Use Continue with Google to log in." );
             return res.redirect('/authenticate/forgot-password');
         }
 // Generate a secure random token and hash it before storing in Redis for password reset

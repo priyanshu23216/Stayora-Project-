@@ -36,9 +36,9 @@
   - Google OAuth 2.0 social sign-in via Passport.js.
   - Cryptographic token generation and email OTP verification.
   - Hybrid rate limiting (Express Rate Limiter + custom Redis-backed attempt counters for brute-force mitigation).
-- **Transactional Communications:** Automated guest & host emails (booking confirmations, cancellations, itinerary details, and password recovery) dispatched via `nodemailer`.
-- **Media Management:** Cloudinary CDN and Multer integration for multi-image uploads for properties and individual room categories.
-- **Security Hardening:** Layered defense with `helmet` HTTP headers, `express-rate-limit`, secure session cookies, and flash notifications.
+- **Transactional Communications:** Automated OTP verification emails via `nodemailer`, with HTML email templates ready in `utils/mailer.js` for booking confirmations, cancellations, and password recovery.
+- **Media Management:** Cloudinary CDN (`config/cloudinary.js`) and Multer (`config/multer.js`) configured for upcoming multi-image uploads across properties and rooms.
+- **Security Hardening:** Layered defense with `helmet` HTTP headers (default CSP `script-src 'self'` blocks inline `<script>` tags in EJS—keep client JS in `public/js/`), `express-rate-limit`, secure session cookies, and flash notifications.
 
 ---
 
@@ -65,7 +65,7 @@
 ### Frontend & Client Experience
 - **Templating:** EJS (Embedded JavaScript) with `express-ejs-layouts`
 - **Design System:** Airbnb-inspired hospitality UI tokens (Plus Jakarta Sans typography, clean glassmorphic sticky navigation)
-- **Client Scripts:** Vanilla JavaScript (ES6+) for interactive UI components and client-side form validation (`validate.js`)
+- **Client Scripts:** Vanilla JavaScript (ES6+) for interactive UI components and client-side form validation (`signupValidate.js`, `resendOTP.js`)
 
 ### Backend Engineering
 - **Runtime:** Node.js (v20+, ES Modules)
@@ -101,7 +101,7 @@ Stayora/
 │   └── validator.js        # Zod schemas & Regex rules for signup, login, and reset
 ├── public/                 # Static assets
 │   ├── css/                # Hospitality design system (navbar.css, footer.css, etc.)
-│   └── js/                 # Client-side UI interactions (validate.js)
+│   └── js/                 # Client-side scripts (signupValidate.js, resendOTP.js)
 ├── views/                  # EJS template views
 │   ├── layouts/            # Master layout (boilerplate.ejs)
 │   ├── partials/           # Reusable components (navbar.ejs, footer.ejs)
@@ -196,10 +196,11 @@ Open **`http://localhost:8080`** in your browser.
 | `GET` | `/authenticate/signup` | Renders guest/host registration form. |
 | `POST` | `/authenticate/signup/add` | Validates input via Zod schema & regex, sends OTP, and caches state in Redis. |
 | `POST` | `/authenticate/signup/verify-otp` | Compares OTP, creates user record in MySQL, and establishes session. |
+| `POST` | `/authenticate/signup/resend-otp` | Resends a fresh 6-digit OTP with Redis rate-limiting (max 3 per 15 min). |
 | `GET` | `/authenticate/google` | Triggers Google OAuth 2.0 consent flow. |
 | `GET` | `/authenticate/google/callback` | OAuth callback endpoint exchanging tokens for user profile. |
 | `GET` | `/authenticate/forgot-password` | Renders password recovery form. |
-| `POST` | `/authenticate/forgot-password` | Generates secure cryptographic reset token and dispatches email. |
+| `POST` | `/authenticate/forgot-password/submit` | *(Planned)* Form target in `forgot-password.ejs` for reset links (route pending in `authentication.js`). |
 | `GET` | `/authenticate/logout` | Terminates Passport session and purges cookies. |
 
 ---

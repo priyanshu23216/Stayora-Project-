@@ -50,7 +50,7 @@ passport.use(
                 // If the user is found but does not have a password (e.g., registered via Google/GitHub), return an error message
 
                 if (!user.PASSWORD) {
-                    return done(null, false, { message: "Please login using Google/GitHub" });
+                    return done(null, false, { message: "Please login using Google" });
                 }
                 // Compare the provided password with the hashed password in the database
 

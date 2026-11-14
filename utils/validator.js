@@ -30,6 +30,7 @@ export const otpValidator = z.object({
     email : z.string().toLowerCase().trim().email("Some error occured please signup again"),
     otp : z.string().trim().regex(/^[0-9]{6}$/, "OTP must be a 6 digit number") // character class[ 0 - 9 ] checks each digit of input OTP should be between 0-9 and { 6 } checks whether input OTP is of  numerical 6 digit b/w 0 to 9  or not ^ and $ marks the start and end of input otp respectively. 
 }); 
-
-
-
+// to validate email input for reset password route
+export const emailValidator = z.object({
+    email : z.string().toLowerCase().trim().email("Enter a valid email,example - user@domain.com")
+});

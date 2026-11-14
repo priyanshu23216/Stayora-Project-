@@ -4,10 +4,12 @@ import bcrypt from "bcrypt";
 import db from "../config/db.js";
 import rateLimit from "express-rate-limit";
 import passport from "../config/passport.js";
-import {sendOtpEmail} from "../utils/mailer.js";
+import {sendOtpEmail , resetPass} from "../utils/mailer.js";
 import crypto from "crypto";
 import redis from "../config/redis.js";
-import {signupSchema , loginCheck , resetPassword ,  otpValidator }from "../utils/validator.js";
+import {signupSchema , loginCheck , resetPassword , emailValidator , otpValidator }from "../utils/validator.js";
+import "dotenv/config";
+
 
 
 
@@ -20,7 +22,23 @@ const signupLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-async function  loginLimiter ( req , res , next ){
+async function loginIPlimiter( req , res , next){
+    // check IP based limit for login attempts to prevent brute force attacks
+    const ipAddress = req.ip;
+    const redisKey = `login:ip:${ipAddress}`;
+    const limit = await redis.incr( redisKey );
+    
+    if ( limit == 1 ){// if this is the first login attempt for this IP address, set an expiration time of 15 minutes for the Redis key
+        await redis.expire( redisKey , 900 );
+    }
+    if ( limit > 30 ){// if the user has exceeded the limit of 30 login attempts within 15 minutes, block further attempts and return an error message
+        req.flash("error" ,"Too Many login attempts from this IP.Please Try Again after 15 minutes");
+        return res.redirect('/authenticate/login');
+    }
+    return next();
+};
+
+async function  loginEmailLimiter ( req , res , next ){
     let result = loginCheck.safeParse( req.body );
     try {
         if( !result.success ){
@@ -46,6 +64,49 @@ async function  loginLimiter ( req , res , next ){
         return next( err );
     };
 };
+async function forgotPassIPlimiter( req , res , next){
+    // check IP based limit for forgot password attempts to prevent brute force attacks
+    const ipAddress = req.ip;
+    const redisKey = `forgotPass:ip:${ipAddress}`;
+    const limit = await redis.incr( redisKey );
+    
+    if ( limit == 1 ){// if this is the first forgot password attempt for this IP address, set an expiration time of 15 minutes for the Redis key
+        await redis.expire( redisKey , 900 );
+    }
+    if ( limit > 10 ){// if the user has exceeded the limit of 10 forgot password attempts within 15 minutes, block further attempts and return an error message
+        req.flash("error" ,"Too Many forgot password attempts from this IP.Please Try Again after 15 minutes");
+        return res.redirect('/authenticate/forgot-password');
+    }
+    return next();
+};
+
+async function forgotPassEmailLimiter ( req , res , next ){
+    let result = emailValidator.safeParse( req.body );
+    try {
+        if( !result.success ){
+        req.flash("error" , "Invalid Email");
+        return res.redirect('/authenticate/forgot-password');
+    };
+    const email = result.data.email;
+    const redisKey = `forgotPass:attempts:${email}`; // create a unique key for each email address
+
+    const limit = await redis.incr( redisKey );// increment the count of forgot password attempts for this email address in Redis
+
+    if ( limit == 1 ){
+// if this is the first forgot password attempt for this email address, set an expiration time of 15 minutes for the Redis key
+        await redis.expire( redisKey , 900 );
+    };
+
+    if( limit > 5 ){
+// if the user has exceeded the limit of 5 forgot password attempts within 15 minutes, block further attempts and return an error message
+        req.flash("error" ,"Too Many attempts.Please Try Again after 15 minutes");
+        return res.redirect('/authenticate/forgot-password');
+    };
+    return next();
+    }catch( err ){
+        return next( err );
+    };
+};
 
 
 
@@ -53,7 +114,7 @@ router.get('/login', (req, res) => {
     res.render('login', { title: 'login' });
 });
 
-router.post('/login/verify', loginLimiter, passport.authenticate("local", {
+router.post('/login/verify',loginIPlimiter, loginEmailLimiter, passport.authenticate("local", {
     failureRedirect: "/authenticate/login",
     failureFlash: true,
 }), (req, res) => {
@@ -217,6 +278,42 @@ router.get('/forgot-password', (req, res) => {
     res.render('forgot-password', { title: 'Forgot Password' });
 });
 
+router.post('/forgot-password/submit', forgotPassIPlimiter ,forgotPassEmailLimiter, async( req , res , next )=>{
+    const result = emailValidator.safeParse( req.body );
+    try {
+        if( !result.success ){
+            req.flash("error" , result.error.issues[0].message);
+            return res.redirect('/authenticate/forgot-password');
+        };
+        const email = result.data.email;
+        const [result] = await db.query('SELECT ID , PASSWORD FROM USERS WHERE EMAIL = ?' , [email]);
+        const user = result[0];
+        if ( !user ){// if email not found in database then send same message to user to prevent email enumeration attacks
+            req.flash("success" , "If email exists thenOTP has been sent to your email for password reset.");
+            return res.redirect('/authenticate/forgot-password')
+        }
+        if( !user.PASSWORD ) { // if user has signed up via Google then send message to user that he/she cannot reset password
+            req.flash("success" , "If email exists thenOTP has been sent to your email for password reset.");
+             await resetPass( email , "Your Stayora account uses Google Sign-In, so there's no password to reset. Use Continue with Google to log in." );
+            return res.redirect('/authenticate/forgot-password');
+        }
+// Generate a secure random token and hash it before storing in Redis for password reset
+        const rawToken = crypto.randomBytes(32).toString("hex");
+        const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+        const redisKey = `resetPass:${hashedToken}`;
+        await redis.set(redisKey, email, "EX", 600);
+        try {
+            await resetPass(email , rawToken);// send the raw token to user email for password reset
+            req.flash("success" , "If email exists then OTP has been sent to your email for password reset.");
+            return res.redirect('/authenticate/forgot-password');
+        } catch (err) {
+            return next(err);
+        };
+    } catch (err) {
+        return next(err);
+    };
+});
+
 router.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) {
@@ -226,6 +323,7 @@ router.get('/logout', (req, res, next) => {
         res.redirect('/');
     });
 });
+
 
 
 

@@ -351,3 +351,64 @@ export const forgotPasswordEmail = async (toEmail, resetLink) => {
     return await transporter.sendMail(mailOptions);
 };
 
+export const resetPass = async (toEmail, message) => {
+    const mailOptions = {
+        from: `"Stayora" <${process.env.EMAIL_USER}>`,
+        to: toEmail,
+        subject: "Stayora - Regarding Password Reset",
+        html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f7f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding: 40px 15px;">
+                <tr>
+                    <td align="center">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 520px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eef0f2;">
+                            <!-- Header / Logo -->
+                            <tr>
+                                <td align="center" style="padding: 30px 20px 20px; border-bottom: 1px solid #f0f2f5;">
+                                    <h1 style="margin: 0; font-size: 28px; font-weight: 800; color: #111827; letter-spacing: -0.5px;">Stayora<span style="color: #ff385c;">.</span></h1>
+                                </td>
+                            </tr>
+
+                            <!-- Body Content -->
+                            <tr>
+                                <td style="padding: 35px 35px 28px;">
+                                    <h2 style="margin: 0 0 14px; font-size: 20px; font-weight: 700; color: #1f2937; text-align: center;">Account Sign-In Notice</h2>
+
+                                    <div style="background-color: #f9fafb; border-left: 4px solid #ff385c; border-radius: 6px; padding: 16px 18px; margin-bottom: 22px;">
+                                        <p style="margin: 0; font-size: 15px; line-height: 24px; color: #374151;">
+                                            ${message}
+                                        </p>
+                                    </div>
+
+                                    <p style="margin: 0; font-size: 13px; line-height: 20px; color: #6b7280; text-align: center;">
+                                        If you did not request this, you can safely ignore this email — your account remains secure.
+                                    </p>
+                                </td>
+                            </tr>
+
+                            <!-- Footer -->
+                            <tr>
+                                <td style="background-color: #fafbfc; padding: 20px; text-align: center; border-top: 1px solid #f0f2f5;">
+                                    <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                                        © ${new Date().getFullYear()} Stayora Inc. All rights reserved.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        `,
+    };
+
+    return await transporter.sendMail(mailOptions);
+};
+

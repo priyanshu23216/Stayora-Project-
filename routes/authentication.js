@@ -24,7 +24,8 @@ const signupLimiter = rateLimit({
 
 async function loginIPlimiter( req , res , next){
     // check IP based limit for login attempts to prevent brute force attacks
-    const ipAddress = req.ip;
+    try {
+        const ipAddress = req.ip;
     const redisKey = `login:ip:${ipAddress}`;
     const limit = await redis.incr( redisKey );
     
@@ -36,6 +37,10 @@ async function loginIPlimiter( req , res , next){
         return res.redirect('/authenticate/login');
     }
     return next();
+
+    }catch( err ){
+        return next( err );
+    }
 };
 
 async function  loginEmailLimiter ( req , res , next ){

@@ -298,7 +298,7 @@ router.post('/forgot-password/submit', forgotPassIPlimiter ,forgotPassEmailLimit
             return res.redirect('/authenticate/forgot-password');
         }
 // Generate a secure random token and hash it before storing in Redis for password reset
-        const rawToken = crypto.randomBytes(32).toString("hex");
+        const rawToken = crypto.randomBytes(32).toString("hex"); // that ramdom 32 byte token is a raw binary buffer and we convert it to hex string format to send it to user email for password reset
         const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
         const redisKey = `resetPass:${hashedToken}`;
         await redis.set(redisKey, email, "EX", 600);

@@ -23,15 +23,15 @@ app.set("views", path.join(__dirname, "views"));
 app.use(expressLayouts);
 app.set("layout", "layouts/boilerplate.ejs");
 
-app.use(helmet());
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(methodOverride("_method"));
-app.use(sessionMiddleware);
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
+app.use(helmet()); // to protect from XSS attacks and other vulnerabilities
+app.use(express.static(path.join(__dirname, "public")));// to serve static files from the public directory
+app.use(express.urlencoded({ extended: true }));// to parse incoming request bodies
+app.use(express.json());// to parse incoming request bodies
+app.use(methodOverride("_method"));// to override HTTP methods as forms only support GET and POST methods, this middleware allows us to use PUT and DELETE methods by adding a query parameter _method to the request URL.
+app.use(sessionMiddleware);// to manage user sessions and store session data in Redis database for better performance and scalability
+app.use(passport.initialize());// to initialize passport middleware for authentication
+app.use(passport.session());// to connect passport with express-session middleware and manage user sessions
+app.use(flash()); // to display flash messages to users after certain actions, such as successful login , Logout or signup
 
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;

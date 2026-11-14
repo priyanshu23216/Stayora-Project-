@@ -298,60 +298,7 @@ export const sendBookingCancellation = async (toEmail, booking) => {
 };
 
 
-export const forgotPasswordEmail = async (toEmail, resetLink) => {
-    const mailOptions = {
-        from: `"Stayora" <${process.env.EMAIL_USER}>`,
-        to: toEmail,
-        subject: "Reset Your Password",
-        html: `
-        <html>
-        <body>
-            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb;">
-                <tr>
-                    <td align="center">
-                        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-collapse: collapse;">
-                            <!-- Header -->
-                            <tr>
-                                <td style="padding: 20px; text-align: center; background-color: #ff385c;">
-                                    <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Stayora</h1>
-                                </td>
-                            </tr>
-                            <!-- Content -->
-                            <tr>
-                                <td style="padding: 30px;">
-                                    <p style="margin: 0; font-size: 16px; color: #111827;">
-                                        Hi there,
-                                    </p>
-                                    <p style="margin: 16px 0; font-size: 16px; color: #111827;">
-                                        You have requested to reset your password. Please click the button below to reset your password:
-                                    </p>
-                                    <div style="text-align: center; margin: 24px 0;">
-                                        <a href="${resetLink}" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #ff385c; color: #ffffff; text-decoration: none; border-radius: 4px;">Reset Password</a>
-                                    </div>
-                                    <p style="margin: 16px 0; font-size: 16px; color: #111827;">
-                                        If you did not request this, please ignore this email.
-                                    </p>
-                                </td>
-                            </tr>
-                            <!-- Footer -->
-                            <tr>
-                                <td style="background-color: #fafbfc; padding: 20px; text-align: center; border-top: 1px solid #f0f2f5;">
-                                    <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                                        © ${new Date().getFullYear()} Stayora Inc. All rights reserved.
-                                    </p>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </body>
-        </html>`,
-    };
-    return await transporter.sendMail(mailOptions);
-};
-
-export const resetPass = async (toEmail, message) => {
+export const resetPassEmail = async (toEmail, message) => {
     const mailOptions = {
         from: `"Stayora" <${process.env.EMAIL_USER}>`,
         to: toEmail,

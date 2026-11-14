@@ -4,10 +4,10 @@ import bcrypt from "bcrypt";
 import db from "../config/db.js";
 import rateLimit from "express-rate-limit";
 import passport from "../config/passport.js";
-import {sendOtpEmail , resetPass} from "../utils/mailer.js";
+import {sendOtpEmail , resetPassEmail} from "../utils/mailer.js";
 import crypto from "crypto";
 import redis from "../config/redis.js";
-import {signupSchema , loginCheck , resetPassword , emailValidator , otpValidator }from "../utils/validator.js";
+import {signupSchema , loginCheck ,resetPassword , emailValidator , otpValidator }from "../utils/validator.js";
 import "dotenv/config";
 
 
@@ -286,8 +286,8 @@ router.post('/forgot-password/submit', forgotPassIPlimiter ,forgotPassEmailLimit
             return res.redirect('/authenticate/forgot-password');
         };
         const email = result.data.email;
-        const [result] = await db.query('SELECT ID , PASSWORD FROM USERS WHERE EMAIL = ?' , [email]);
-        const user = result[0];
+        const [arr] = await db.query('SELECT ID , PASSWORD FROM USERS WHERE EMAIL = ?' , [email]);
+        const user = arr[0];
         if ( !user ){// if email not found in database then send same message to user to prevent email enumeration attacks
             req.flash("success" , "If email exists thenOTP has been sent to your email for password reset.");
             return res.redirect('/authenticate/forgot-password')
@@ -303,7 +303,8 @@ router.post('/forgot-password/submit', forgotPassIPlimiter ,forgotPassEmailLimit
         const redisKey = `resetPass:${hashedToken}`;
         await redis.set(redisKey, email, "EX", 600);
         try {
-            await resetPass(email , rawToken);// send the raw token to user email for password reset
+            const resetLink = `${process.env.APP_URL}/authenticate/reset-password/${rawToken}`; // create a reset link with the raw token to send it to user email for password reset
+            await resetPassEmail(email , resetLink);// send the raw token to user email for password reset
             req.flash("success" , "If email exists then OTP has been sent to your email for password reset.");
             return res.redirect('/authenticate/forgot-password');
         } catch (err) {
